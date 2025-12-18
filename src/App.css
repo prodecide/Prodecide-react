@@ -312,12 +312,14 @@
     text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
 }
 
-.chat-message.ai .message-prefix::before {
-    content: "[ ";
+.chat-message.ai .message-prefix {
+    display: flex;
+    align-items: center;
 }
 
+.chat-message.ai .message-prefix::before,
 .chat-message.ai .message-prefix::after {
-    content: " ]";
+    display: none;
 }
 
 .chat-message.user .message-prefix {
@@ -448,6 +450,62 @@
     50% {
         height: 100%;
         opacity: 1;
+    }
+}
+
+/* Siri Waveform Styling */
+.siri-waveform {
+    width: 60px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    position: relative;
+    overflow: visible;
+}
+
+.siri-waveform svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 5px rgba(0, 255, 0, 0.5));
+}
+
+.siri-waveform path {
+    fill: none;
+    stroke: #0f0;
+    stroke-width: 1.5;
+    opacity: 0.6;
+    animation: siri-wave 2s infinite ease-in-out;
+}
+
+.siri-waveform .wave-1 {
+    animation-delay: 0s;
+    stroke-width: 2;
+    opacity: 0.8;
+}
+
+.siri-waveform .wave-2 {
+    animation-delay: -0.5s;
+    opacity: 0.4;
+    stroke-width: 1;
+}
+
+.siri-waveform .wave-3 {
+    animation-delay: -1s;
+    opacity: 0.2;
+    stroke-width: 1;
+}
+
+@keyframes siri-wave {
+
+    0%,
+    100% {
+        transform: scaleY(0.8) translateX(0);
+    }
+
+    50% {
+        transform: scaleY(1.2) translateX(2px);
     }
 }
 

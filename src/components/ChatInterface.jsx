@@ -27,6 +27,16 @@ const questionKeys = [
     "primary_motivation"
 ];
 
+const SiriWaveform = () => (
+    <div className="siri-waveform">
+        <svg viewBox="0 0 100 40" preserveAspectRatio="none">
+            <path className="wave-1" d="M0 20 Q 25 5, 50 20 T 100 20" />
+            <path className="wave-2" d="M0 20 Q 25 35, 50 20 T 100 20" />
+            <path className="wave-3" d="M0 20 Q 25 10, 50 20 T 100 20" />
+        </svg>
+    </div>
+);
+
 const ChatInterface = () => {
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
@@ -186,7 +196,7 @@ const ChatInterface = () => {
                 {messages.map((msg, index) => (
                     <div key={index} className={`chat-message ${msg.sender}`}>
                         <span className="message-prefix">
-                            {msg.sender === 'ai' ? 'PRODECIDE' : 'USER'}
+                            {msg.sender === 'ai' ? <SiriWaveform /> : 'USER'}
                         </span>
                         <span className="message-text">{msg.text}</span>
                     </div>
@@ -194,7 +204,7 @@ const ChatInterface = () => {
 
                 {isTyping && (
                     <div className="chat-message ai">
-                        <span className="message-prefix">PRODECIDE</span>
+                        <span className="message-prefix"><SiriWaveform /></span>
                         <span className="message-text">{typingText}</span>
                         <span className="typing-cursor">█</span>
                     </div>
