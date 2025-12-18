@@ -33,6 +33,8 @@ const ChatInterface = () => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [userAnswers, setUserAnswers] = useState({});
     const [isTyping, setIsTyping] = useState(false);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [suggestions, setSuggestions] = useState([]);
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -43,11 +45,34 @@ const ChatInterface = () => {
         scrollToBottom();
     }, [messages, isTyping]);
 
-    const silentSubmit = (finalData) => {
-        // In a real industrial app, this would be a fetch() call to your backend
-        console.log("--- SILENT DATA COLLECTION ---");
-        console.log("Captured Profile:", finalData);
-        console.log("-----------------------------");
+    const silentSubmit = async (finalData) => {
+        setIsAnalyzing(true);
+        console.log("--- STARTING LLM ANALYSIS ---");
+
+        try {
+            const response = await fetch('/api/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userAnswers: finalData })
+            });
+
+            const data = await response.json();
+            if (data.suggestions) {
+                setSuggestions(data.suggestions);
+            }
+        } catch (error) {
+            console.error("Analysis failed:", error);
+            // Mock data for development if API fails or isn't configured yet
+            setSuggestions([
+                { title: "Software Engineer", description: "Matches your interest in hands-on practical work and problem solving." },
+                { title: "UI/UX Designer", description: "Fits your creative drive and design-oriented thinking." },
+                { title: "Data Scientist", description: "Aligns with your academic strengths in math and theoretical logic." },
+                { title: "Cybersecurity Analyst", description: "Good for your preference for hands-on, high-impact work." },
+                { title: "Product Manager", description: "Leverages your ability to balance risks and passions." }
+            ]);
+        } finally {
+            setIsAnalyzing(false);
+        }
     };
 
     useEffect(() => {
@@ -111,6 +136,23 @@ const ChatInterface = () => {
         setCurrentQuestionIndex(prev => prev + 1);
     };
 
+    if (suggestions.length > 0) {
+        return (
+            <div className="results-container persona-container">
+                <h2 className="persona-title">Top 5 Career Segments</h2>
+                <div className="results-grid">
+                    {suggestions.map((s, i) => (
+                        <div key={i} className="result-card" style={{ animationDelay: `${i * 0.1}s` }}>
+                            <h3>{s.title}</h3>
+                            <p>{s.description}</p>
+                        </div>
+                    ))}
+                </div>
+                <button className="cta-button" onClick={() => window.location.reload()}>Start Over</button>
+            </div>
+        );
+    }
+
     return (
         <div className="chat-interface-container">
             <div className="chat-window">
@@ -136,6 +178,16 @@ const ChatInterface = () => {
                         <span className="typing-cursor">█</span>
                     </div>
                 )}
+                {isAnalyzing && (
+                    <div className="chat-message ai">
+                        <div className="ai-waveform">
+                            <div className="bar"></div>
+                            <div className="bar"></div>
+                            <div className="bar"></div>
+                        </div>
+                        <span className="message-text italic">Analyzing your digital profile... Matrix crunching data...</span>
+                    </div>
+                )}
                 <div ref={messagesEndRef} />
             </div>
 
@@ -147,8 +199,8 @@ const ChatInterface = () => {
                     onChange={(e) => setInputValue(e.target.value)}
                     className="chat-input"
                     autoFocus
-                    placeholder={isTyping ? "..." : "Type your answer..."}
-                    disabled={isTyping || currentQuestionIndex >= questions.length}
+                    placeholder={isTyping || isAnalyzing ? "..." : "Type your answer..."}
+                    disabled={isTyping || isAnalyzing || currentQuestionIndex >= questions.length}
                 />
             </form>
         </div>
