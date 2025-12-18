@@ -195,9 +195,9 @@ const ChatInterface = () => {
                 <div className="scanline"></div>
                 {messages.map((msg, index) => (
                     <div key={index} className={`chat-message ${msg.sender}`}>
-                        <span className="message-prefix">
-                            {msg.sender === 'ai' ? <SiriWaveform /> : 'USER'}
-                        </span>
+                        {msg.sender === 'ai' && (
+                            <span className="message-prefix"><SiriWaveform /></span>
+                        )}
                         <span className="message-text">{msg.text}</span>
                     </div>
                 ))}
