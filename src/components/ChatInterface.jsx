@@ -33,6 +33,7 @@ const ChatInterface = () => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [userAnswers, setUserAnswers] = useState({});
     const [isTyping, setIsTyping] = useState(false);
+    const [typingText, setTypingText] = useState('');
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [suggestions, setSuggestions] = useState([]);
     const messagesEndRef = useRef(null);
@@ -108,11 +109,27 @@ const ChatInterface = () => {
 
     const typeMessage = async (text) => {
         setIsTyping(true);
-        // Simulate typing delay
-        await new Promise(resolve => setTimeout(resolve, 500));
+        setTypingText('');
 
-        playMessageSound();
+        // Initial delay
+        await new Promise(resolve => setTimeout(resolve, 600));
+
+        let currentText = '';
+        for (let i = 0; i < text.length; i++) {
+            currentText += text[i];
+            setTypingText(currentText);
+
+            // Play sound every few characters for a "printing" effect
+            if (i % 3 === 0) playMessageSound();
+
+            // Randomize typing speed for organic feel
+            const speed = Math.random() * 30 + 20;
+            await new Promise(resolve => setTimeout(resolve, speed));
+        }
+
+        // Move completed message to state
         setMessages(prev => [...prev, { sender: 'ai', text }]);
+        setTypingText('');
         setIsTyping(false);
     };
 
@@ -127,13 +144,15 @@ const ChatInterface = () => {
             [currentKey]: inputValue
         }));
 
-        // Add user message
+        // Add user message to UI immediately
         const newMessages = [...messages, { sender: 'user', text: inputValue }];
         setMessages(newMessages);
         setInputValue('');
 
-        // Move to next question
-        setCurrentQuestionIndex(prev => prev + 1);
+        // Move to next question after a small lag
+        setTimeout(() => {
+            setCurrentQuestionIndex(prev => prev + 1);
+        }, 300);
     };
 
     if (suggestions.length > 0) {
@@ -153,39 +172,43 @@ const ChatInterface = () => {
         );
     }
 
+    const progress = Math.min((currentQuestionIndex / questions.length) * 100, 100);
+
     return (
         <div className="chat-interface-container">
+            <div className="progress-container">
+                <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+                <span className="progress-text">Session Data Collected: {Math.round(progress)}%</span>
+            </div>
+
             <div className="chat-window">
+                <div className="scanline"></div>
                 {messages.map((msg, index) => (
                     <div key={index} className={`chat-message ${msg.sender}`}>
-                        {msg.sender === 'ai' && (
-                            <div className="ai-waveform">
-                                <div className="bar"></div>
-                                <div className="bar"></div>
-                                <div className="bar"></div>
-                            </div>
-                        )}
+                        <span className="message-prefix">
+                            {msg.sender === 'ai' ? 'PRODECIDE' : 'USER'}
+                        </span>
                         <span className="message-text">{msg.text}</span>
                     </div>
                 ))}
+
                 {isTyping && (
                     <div className="chat-message ai">
-                        <div className="ai-waveform">
-                            <div className="bar"></div>
-                            <div className="bar"></div>
-                            <div className="bar"></div>
-                        </div>
+                        <span className="message-prefix">PRODECIDE</span>
+                        <span className="message-text">{typingText}</span>
                         <span className="typing-cursor">█</span>
                     </div>
                 )}
+
                 {isAnalyzing && (
                     <div className="chat-message ai">
-                        <div className="ai-waveform">
+                        <span className="message-prefix">SYSTEM</span>
+                        <span className="message-text italic">Analyzing your digital profile... Matrix crunching data...</span>
+                        <div className="ai-waveform" style={{ marginLeft: '1rem', marginTop: '2px' }}>
                             <div className="bar"></div>
                             <div className="bar"></div>
                             <div className="bar"></div>
                         </div>
-                        <span className="message-text italic">Analyzing your digital profile... Matrix crunching data...</span>
                     </div>
                 )}
                 <div ref={messagesEndRef} />
