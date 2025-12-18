@@ -1,0 +1,221 @@
+/* Default App.css cleared for ProDecide custom styling */
+
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.cta-button {
+    margin-top: 2rem;
+    padding: 1rem 2rem;
+    font-size: 1.5rem;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    color: #fff;
+    background-color: transparent;
+    border: 2px solid #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+    transition: all 0.3s ease;
+    animation: blink 2s infinite;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.cta-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    animation: none;
+    /* Stop blinking on hover */
+}
+
+/* Persona Selection Styling */
+.persona-container {
+    text-align: center;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.persona-title {
+    color: #fff;
+    font-family: 'Roboto', sans-serif;
+    font-size: 2rem;
+    margin-bottom: 3rem;
+    font-weight: 700;
+}
+
+.persona-options {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+}
+
+.persona-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.persona-card:hover {
+    transform: translateY(-10px);
+}
+
+.icon-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+.persona-card:hover .icon-circle {
+    background-color: #fff;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
+}
+
+.persona-icon {
+    width: 80px;
+    height: 80px;
+    color: #333;
+    /* Dark icon color against light background */
+}
+
+.persona-card p {
+    color: #fff;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Chat Interface Styling */
+.chat-interface-container {
+    width: 80%;
+    max-width: 800px;
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 20, 0, 0.85);
+    border: 1px solid #0f0;
+    padding: 1rem;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+    font-family: 'Courier New', Courier, monospace;
+    animation: fadeIn 0.5s ease-in;
+}
+
+.chat-window {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    padding-right: 0.5rem;
+}
+
+/* Custom scrollbar for webkit browsers */
+.chat-window::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-window::-webkit-scrollbar-thumb {
+    background-color: #0f0;
+    border-radius: 4px;
+}
+
+.chat-window::-webkit-scrollbar-track {
+    background-color: rgba(0, 50, 0, 0.5);
+}
+
+.chat-message {
+    margin-bottom: 1rem;
+    line-height: 1.5;
+    display: flex;
+}
+
+.message-prefix {
+    color: #0f0;
+    font-weight: bold;
+    margin-right: 0.5rem;
+    white-space: nowrap;
+}
+
+.message-text {
+    color: #fff;
+}
+
+.chat-message.user .message-text {
+    color: #cfc;
+}
+
+.chat-message.user {
+    justify-content: flex-end;
+}
+
+.typing-cursor {
+    color: #0f0;
+    animation: blink 1s infinite step-end;
+}
+
+.chat-input-area {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #0f0;
+    padding-top: 0.5rem;
+}
+
+.input-prefix {
+    color: #0f0;
+    font-weight: bold;
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.chat-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.1rem;
+    outline: none;
+}
+
+.ai-bubble {
+    width: 12px;
+    height: 12px;
+    background-color: #0f0;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #0f0, 0 0 20px #0f0;
+    margin-right: 0.8rem;
+    display: inline-block;
+    align-self: center;
+    /* Ensure it aligns vertically with text if flex container */
+    flex-shrink: 0;
+}
