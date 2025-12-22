@@ -1,30 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../App.css';
 
-const questions = [
-    "What is your name?",
-    "What grade or level are you currently studying in? (e.g., 10th, 12th, undergraduate year)",
-    "Which subjects do you enjoy the most?",
-    "Which subjects do you perform best in academically?",
-    "What activities excite you outside academics? (e.g., coding, writing, designing, debating, sports)",
-    "Do you prefer theoretical learning or practical, hands-on work?",
-    "What kind of work environment do you imagine for yourself? (Office / Remote / Fieldwork / Creative studio / Research)",
-    "Are you more interested in stability or risk-taking? (Stable job / Entrepreneurship / Freelancing)",
-    "Do you have any career role or profession in mind already? (even if unsure)",
-    "What matters more to you right now? (Passion / Salary / Social impact / Work-life balance)"
-];
-
-const questionKeys = [
-    "name",
-    "education_level",
-    "favorite_subjects",
-    "academic_strengths",
-    "extracurriculars",
-    "learning_preference",
-    "ideal_environment",
-    "risk_profile",
-    "career_interests",
-    "primary_motivation"
+const sessionQuestions = [
+    { key: "name", text: "What is your name?" },
+    { key: "education_level", text: "Your current class or qualification?", options: ["10th", "12th", "UG"] },
+    {
+        key: "logical_sudoku",
+        text: "Let's solve a quick puzzle!\n🔺   ⬛   ⭕\n⭕   🔺   ?\n⬛   ⭕   🔺\n👉 Which shape follows the pattern?",
+        instructions: "RULES: Each shape appears once per row. Each shape appears once per column.",
+        options: ["🔺", "⬛", "⭕"]
+    },
+    {
+        key: "numerical_puzzle",
+        text: "Let’s try a quick number puzzle 👇\n\n🔵 + 🔵 = 10\n🔵 + 🔺 = 8\n🔺 + ⬛ = 7\n\n👉 What number does ⬛ represent?",
+        options: ["1", "2", "3", "4"]
+    },
+    { key: "extracurriculars", text: "What activities excite you outside academics? (e.g., coding, writing, designing, debating, sports)" },
+    { key: "learning_preference", text: "Do you prefer theoretical learning or practical, hands-on work?" },
+    { key: "ideal_environment", text: "What kind of work environment do you imagine for yourself? (Office / Remote / Fieldwork / Creative studio / Research)" },
+    { key: "risk_profile", text: "Are you more interested in stability or risk-taking? (Stable job / Entrepreneurship / Freelancing)" },
+    { key: "career_interests", text: "Do you have any career role or profession in mind already? (even if unsure)" },
+    { key: "primary_motivation", text: "What matters more to you right now? (Passion / Salary / Social impact / Work-life balance)" }
 ];
 
 const SiriWaveform = () => (
@@ -47,6 +43,8 @@ const ChatInterface = () => {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [suggestions, setSuggestions] = useState([]);
     const messagesEndRef = useRef(null);
+    const inputRef = useRef(null);
+    const lastAskedIndex = useRef(-1);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -54,7 +52,24 @@ const ChatInterface = () => {
 
     useEffect(() => {
         scrollToBottom();
-    }, [messages, isTyping]);
+        // Focus input after messages change/typing ends
+        if (!isTyping && !isAnalyzing) {
+            inputRef.current?.focus();
+        }
+    }, [messages, isTyping, isAnalyzing]);
+
+    // Keep focus even if clicking background
+    useEffect(() => {
+        const handleGlobalClick = (e) => {
+            // Only refocus if not clicking on the input itself or other interactive elements (if any)
+            if (inputRef.current && !inputRef.current.disabled && document.activeElement !== inputRef.current) {
+                inputRef.current.focus();
+            }
+        };
+
+        window.addEventListener('click', handleGlobalClick);
+        return () => window.removeEventListener('click', handleGlobalClick);
+    }, []);
 
     const silentSubmit = async (finalData) => {
         setIsAnalyzing(true);
@@ -87,8 +102,11 @@ const ChatInterface = () => {
     };
 
     useEffect(() => {
-        if (currentQuestionIndex < questions.length) {
-            typeMessage(questions[currentQuestionIndex]);
+        if (currentQuestionIndex === lastAskedIndex.current) return;
+        lastAskedIndex.current = currentQuestionIndex;
+
+        if (currentQuestionIndex < sessionQuestions.length) {
+            typeMessage(sessionQuestions[currentQuestionIndex].text);
         } else {
             typeMessage("Thank you for your responses. Analyzing your profile...");
             silentSubmit(userAnswers);
@@ -99,22 +117,53 @@ const ChatInterface = () => {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         if (!AudioContext) return;
 
-        const ctx = new AudioContext();
-        const oscillator = ctx.createOscillator();
-        const gainNode = ctx.createGain();
+        try {
+            const ctx = new AudioContext();
 
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(800, ctx.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.1);
+            // 1. Mechanical 'Impact' (White Noise burst)
+            const bufferSize = ctx.sampleRate * 0.04;
+            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
 
-        gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+            const noiseSource = ctx.createBufferSource();
+            noiseSource.buffer = buffer;
 
-        oscillator.connect(gainNode);
-        gainNode.connect(ctx.destination);
+            const noiseGain = ctx.createGain();
+            noiseGain.gain.setValueAtTime(0.04, ctx.currentTime);
+            noiseGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
 
-        oscillator.start();
-        oscillator.stop(ctx.currentTime + 0.1);
+            const noiseFilter = ctx.createBiquadFilter();
+            noiseFilter.type = 'bandpass';
+            noiseFilter.frequency.value = 1200;
+            noiseFilter.Q.value = 1;
+
+            noiseSource.connect(noiseFilter);
+            noiseFilter.connect(noiseGain);
+            noiseGain.connect(ctx.destination);
+
+            // 2. Short metallic resonance (Triangle)
+            const oscillator = ctx.createOscillator();
+            const resGain = ctx.createGain();
+
+            oscillator.type = 'triangle';
+            oscillator.frequency.setValueAtTime(2000, ctx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.02);
+
+            resGain.gain.setValueAtTime(0.01, ctx.currentTime);
+            resGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.02);
+
+            oscillator.connect(resGain);
+            resGain.connect(ctx.destination);
+
+            noiseSource.start();
+            oscillator.start();
+            oscillator.stop(ctx.currentTime + 0.04);
+        } catch (e) {
+            console.error("Audio context error:", e);
+        }
     };
 
     const typeMessage = async (text) => {
@@ -143,26 +192,31 @@ const ChatInterface = () => {
         setIsTyping(false);
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!inputValue.trim()) return;
+    const handleChoiceSelect = (choice) => {
+        submitAnswer(choice);
+    };
 
-        // Capture answer in background
-        const currentKey = questionKeys[currentQuestionIndex];
+    const submitAnswer = (value) => {
+        const currentKey = sessionQuestions[currentQuestionIndex]?.key;
+        if (!currentKey) return;
+
         setUserAnswers(prev => ({
             ...prev,
-            [currentKey]: inputValue
+            [currentKey]: value
         }));
 
-        // Add user message to UI immediately
-        const newMessages = [...messages, { sender: 'user', text: inputValue }];
-        setMessages(newMessages);
         setInputValue('');
 
         // Move to next question after a small lag
         setTimeout(() => {
             setCurrentQuestionIndex(prev => prev + 1);
         }, 300);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!inputValue.trim()) return;
+        submitAnswer(inputValue);
     };
 
     if (suggestions.length > 0) {
@@ -182,7 +236,15 @@ const ChatInterface = () => {
         );
     }
 
-    const progress = Math.min((currentQuestionIndex / questions.length) * 100, 100);
+    const progress = Math.min((currentQuestionIndex / sessionQuestions.length) * 100, 100);
+
+    const aptitudeIndicators = [
+        { label: "Logical reasoning", keys: ["logical_sudoku"] },
+        { label: "Numerical ability", keys: ["numerical_puzzle"] },
+        { label: "Verbal ability", keys: ["extracurriculars"] },
+        { label: "Abstract reasoning", keys: ["ideal_environment"] },
+        { label: "Spatial ability", keys: ["career_interests"] }
+    ];
 
     return (
         <div className="chat-interface-container">
@@ -191,51 +253,96 @@ const ChatInterface = () => {
                 <span className="progress-text">Session Data Collected: {Math.round(progress)}%</span>
             </div>
 
-            <div className="chat-window">
-                <div className="scanline"></div>
-                {messages.map((msg, index) => (
-                    <div key={index} className={`chat-message ${msg.sender}`}>
-                        {msg.sender === 'ai' && (
-                            <span className="message-prefix"><SiriWaveform /></span>
+            <div className="chat-main-layout">
+                <div className="chat-window-wrapper">
+                    <div className="chat-window">
+                        <div className="scanline"></div>
+
+                        {/* Display specific instructions/rules at the top if they exist for the current question */}
+                        {sessionQuestions[currentQuestionIndex]?.instructions && (
+                            <div className="system-instruction-box">
+                                <span className="system-tag">SYSTEM RULES</span>
+                                <p>{sessionQuestions[currentQuestionIndex].instructions}</p>
+                            </div>
                         )}
-                        <span className="message-text">{msg.text}</span>
-                    </div>
-                ))}
 
-                {isTyping && (
-                    <div className="chat-message ai">
-                        <span className="message-prefix"><SiriWaveform /></span>
-                        <span className="message-text">{typingText}</span>
-                        <span className="typing-cursor">█</span>
-                    </div>
-                )}
+                        {/* Only show the current AI message or typing state to 'hide' previous questions */}
+                        {isTyping ? (
+                            <div className="chat-message ai">
+                                <span className="message-prefix"><SiriWaveform /></span>
+                                <span className="message-text">{typingText}</span>
+                                <span className="typing-cursor">█</span>
+                            </div>
+                        ) : (
+                            messages.length > 0 && (
+                                <div className={`chat-message ai`}>
+                                    <span className="message-prefix"><SiriWaveform /></span>
+                                    <span className="message-text">{messages[messages.length - 1].text}</span>
+                                </div>
+                            )
+                        )}
 
-                {isAnalyzing && (
-                    <div className="chat-message ai">
-                        <span className="message-prefix">SYSTEM</span>
-                        <span className="message-text italic">Analyzing your digital profile... Matrix crunching data...</span>
-                        <div className="ai-waveform" style={{ marginLeft: '1rem', marginTop: '2px' }}>
-                            <div className="bar"></div>
-                            <div className="bar"></div>
-                            <div className="bar"></div>
-                        </div>
+                        {isAnalyzing && (
+                            <div className="chat-message ai">
+                                <span className="message-prefix">SYSTEM</span>
+                                <span className="message-text italic">Analyzing your digital profile... Matrix crunching data...</span>
+                                <div className="ai-waveform" style={{ marginLeft: '1rem', marginTop: '2px' }}>
+                                    <div className="bar"></div>
+                                    <div className="bar"></div>
+                                    <div className="bar"></div>
+                                </div>
+                            </div>
+                        )}
+                        <div ref={messagesEndRef} />
                     </div>
-                )}
-                <div ref={messagesEndRef} />
+
+                    <div className="chat-control-wrapper">
+                        {/* Render options if they exist for the current question */}
+                        {!isTyping && sessionQuestions[currentQuestionIndex]?.options && (
+                            <div className="choice-options-container">
+                                {sessionQuestions[currentQuestionIndex].options.map((option, idx) => (
+                                    <button
+                                        key={idx}
+                                        className="choice-button"
+                                        onClick={() => handleChoiceSelect(option)}
+                                    >
+                                        {option}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSubmit} className="chat-input-area">
+                            <span className="input-prefix">{'>'}</span>
+                            <input
+                                ref={inputRef}
+                                type="text"
+                                value={inputValue}
+                                onChange={(e) => setInputValue(e.target.value)}
+                                className="chat-input"
+                                autoFocus
+                                placeholder={isTyping || isAnalyzing ? "..." : "Type your answer..."}
+                                disabled={isTyping || isAnalyzing || currentQuestionIndex >= sessionQuestions.length}
+                            />
+                        </form>
+                    </div>
+                </div>
+
+                <div className="status-card">
+                    <div className="status-card-title">Aptitude Profile</div>
+                    {aptitudeIndicators.map((indicator, idx) => {
+                        const isCollected = indicator.keys.every(key => userAnswers[key]);
+                        return (
+                            <div key={idx} className="status-item">
+                                <span className="status-label">{indicator.label}</span>
+                                <span className={`status-indicator ${isCollected ? 'collected' : 'missing'}`}>
+                                    {isCollected ? 'ANALYZED' : 'PENDING'}
+                                </span>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
-
-            <form onSubmit={handleSubmit} className="chat-input-area">
-                <span className="input-prefix">{'>'}</span>
-                <input
-                    type="text"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    className="chat-input"
-                    autoFocus
-                    placeholder={isTyping || isAnalyzing ? "..." : "Type your answer..."}
-                    disabled={isTyping || isAnalyzing || currentQuestionIndex >= questions.length}
-                />
-            </form>
         </div>
     );
 };
