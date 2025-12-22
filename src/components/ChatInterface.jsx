@@ -42,6 +42,7 @@ const ChatInterface = () => {
     const [typingText, setTypingText] = useState('');
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [suggestions, setSuggestions] = useState([]);
+    const [isSignedUp, setIsSignedUp] = useState(false);
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
     const lastAskedIndex = useRef(-1);
@@ -220,9 +221,34 @@ const ChatInterface = () => {
     };
 
     if (suggestions.length > 0) {
+        if (!isSignedUp) {
+            return (
+                <div className="results-container gate-container">
+                    <div className="gate-content">
+                        <div className="success-icon">✓</div>
+                        <h2 className="gate-title">Analysis Complete</h2>
+                        <p className="gate-subtitle">Your personalized career roadmap is ready for decryption.</p>
+
+                        <div className="premium-lock-box">
+                            <div className="lock-icon">🔒</div>
+                            <p>We've analyzed your logical, numerical, and verbal patterns to find your top 5 matching careers.</p>
+                        </div>
+
+                        <div className="gate-cta-box">
+                            <p className="cta-text">Join ProDecide to unlock your full profile</p>
+                            <button className="cta-button signup-button" onClick={() => setIsSignedUp(true)}>
+                                Sign Up to View Results
+                            </button>
+                            <span className="cta-subtext">Free immediate access to your analysis</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
         return (
             <div className="results-container persona-container">
-                <h2 className="persona-title">Top 5 Career Segments</h2>
+                <h2 className="persona-title">Your Career Roadmap</h2>
                 <div className="results-grid">
                     {suggestions.map((s, i) => (
                         <div key={i} className="result-card" style={{ animationDelay: `${i * 0.1}s` }}>
@@ -231,7 +257,9 @@ const ChatInterface = () => {
                         </div>
                     ))}
                 </div>
-                <button className="cta-button" onClick={() => window.location.reload()}>Start Over</button>
+                <div className="results-footer">
+                    <button className="cta-button" onClick={() => window.location.reload()}>Start New Session</button>
+                </div>
             </div>
         );
     }
