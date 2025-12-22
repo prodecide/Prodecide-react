@@ -43,6 +43,8 @@ const ChatInterface = () => {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [suggestions, setSuggestions] = useState([]);
     const [isSignedUp, setIsSignedUp] = useState(false);
+    const [isManualPath, setIsManualPath] = useState(false);
+    const [manualBrief, setManualBrief] = useState('');
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
     const lastAskedIndex = useRef(-1);
@@ -71,6 +73,11 @@ const ChatInterface = () => {
         window.addEventListener('click', handleGlobalClick);
         return () => window.removeEventListener('click', handleGlobalClick);
     }, []);
+
+    const handleSkipAssessment = () => {
+        setIsManualPath(true);
+        setCurrentQuestionIndex(sessionQuestions.length); // Trigger terminal state logic
+    };
 
     const silentSubmit = async (finalData) => {
         setIsAnalyzing(true);
@@ -108,11 +115,16 @@ const ChatInterface = () => {
 
         if (currentQuestionIndex < sessionQuestions.length) {
             typeMessage(sessionQuestions[currentQuestionIndex].text);
+        } else if (isManualPath && !manualBrief) {
+            typeMessage("Can you brief what is in your mind?");
+        } else if (isManualPath && manualBrief) {
+            // Manual path completed
+            setSuggestions([{ title: manualBrief, description: "Your manually entered career choice." }]);
         } else {
             typeMessage("Thank you for your responses. Analyzing your profile...");
             silentSubmit(userAnswers);
         }
-    }, [currentQuestionIndex]);
+    }, [currentQuestionIndex, isManualPath, manualBrief]);
 
     const playMessageSound = () => {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -198,6 +210,12 @@ const ChatInterface = () => {
     };
 
     const submitAnswer = (value) => {
+        if (isManualPath && currentQuestionIndex >= sessionQuestions.length) {
+            setManualBrief(value);
+            setInputValue('');
+            return;
+        }
+
         const currentKey = sessionQuestions[currentQuestionIndex]?.key;
         if (!currentKey) return;
 
@@ -248,7 +266,7 @@ const ChatInterface = () => {
 
         return (
             <div className="results-container persona-container">
-                <h2 className="persona-title">Your Career Roadmap</h2>
+                <h2 className="persona-title">{isManualPath ? "Your Specified Career" : "Your Career Roadmap"}</h2>
                 <div className="results-grid">
                     {suggestions.map((s, i) => (
                         <div key={i} className="result-card" style={{ animationDelay: `${i * 0.1}s` }}>
@@ -350,9 +368,17 @@ const ChatInterface = () => {
                                 className="chat-input"
                                 autoFocus
                                 placeholder={isTyping || isAnalyzing ? "..." : "Type your answer..."}
-                                disabled={isTyping || isAnalyzing || currentQuestionIndex >= sessionQuestions.length}
+                                disabled={isTyping || isAnalyzing || (currentQuestionIndex >= sessionQuestions.length && !isManualPath) || (isManualPath && manualBrief)}
                             />
                         </form>
+
+                        {!isManualPath && currentQuestionIndex < sessionQuestions.length && !isTyping && (
+                            <div className="skip-action-container">
+                                <button className="skip-btn" onClick={handleSkipAssessment}>
+                                    I have something in mind
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
 
