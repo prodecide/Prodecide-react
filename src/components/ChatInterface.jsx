@@ -211,8 +211,16 @@ const ChatInterface = () => {
 
     const submitAnswer = (value) => {
         if (isManualPath && currentQuestionIndex >= sessionQuestions.length) {
-            setManualBrief(value);
+            // Show user message first
+            setMessages(prev => [...prev, { sender: 'user', text: value }]);
             setInputValue('');
+
+            // Artificial delay for "processing" feel before gating
+            setIsAnalyzing(true);
+            setTimeout(() => {
+                setIsAnalyzing(false);
+                setManualBrief(value);
+            }, 1000);
             return;
         }
 
