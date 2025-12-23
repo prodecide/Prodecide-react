@@ -23,16 +23,6 @@ const sessionQuestions = [
     { key: "primary_motivation", text: "What matters more to you right now? (Passion / Salary / Social impact / Work-life balance)" }
 ];
 
-const SiriWaveform = () => (
-    <div className="siri-waveform">
-        <svg viewBox="0 0 100 40" preserveAspectRatio="none">
-            <path className="wave-1" d="M0 20 Q 25 5, 50 20 T 100 20" />
-            <path className="wave-2" d="M0 20 Q 25 35, 50 20 T 100 20" />
-            <path className="wave-3" d="M0 20 Q 25 10, 50 20 T 100 20" />
-        </svg>
-    </div>
-);
-
 const ChatInterface = () => {
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
@@ -55,34 +45,28 @@ const ChatInterface = () => {
 
     useEffect(() => {
         scrollToBottom();
-        // Focus input after messages change/typing ends
         if (!isTyping && !isAnalyzing) {
             inputRef.current?.focus();
         }
     }, [messages, isTyping, isAnalyzing]);
 
-    // Keep focus even if clicking background
     useEffect(() => {
         const handleGlobalClick = (e) => {
-            // Only refocus if not clicking on the input itself or other interactive elements (if any)
             if (inputRef.current && !inputRef.current.disabled && document.activeElement !== inputRef.current) {
                 inputRef.current.focus();
             }
         };
-
         window.addEventListener('click', handleGlobalClick);
         return () => window.removeEventListener('click', handleGlobalClick);
     }, []);
 
     const handleSkipAssessment = () => {
         setIsManualPath(true);
-        setCurrentQuestionIndex(sessionQuestions.length); // Trigger terminal state logic
+        setCurrentQuestionIndex(sessionQuestions.length);
     };
 
     const silentSubmit = async (finalData) => {
         setIsAnalyzing(true);
-        console.log("--- STARTING LLM ANALYSIS ---");
-
         try {
             const response = await fetch('/api/analyze', {
                 method: 'POST',
@@ -96,7 +80,6 @@ const ChatInterface = () => {
             }
         } catch (error) {
             console.error("Analysis failed:", error);
-            // Mock data for development if API fails or isn't configured yet
             setSuggestions([
                 { title: "Software Engineer", description: "Matches your interest in hands-on practical work and problem solving." },
                 { title: "UI/UX Designer", description: "Fits your creative drive and design-oriented thinking." },
@@ -116,90 +99,28 @@ const ChatInterface = () => {
         if (currentQuestionIndex < sessionQuestions.length) {
             typeMessage(sessionQuestions[currentQuestionIndex].text);
         } else if (isManualPath && !manualBrief) {
-            typeMessage("Can you brief what is in your mind?");
+            typeMessage("Please describe the specific career path you're considering.");
         } else if (isManualPath && manualBrief) {
-            // Manual path completed
-            setSuggestions([{ title: manualBrief, description: "Your manually entered career choice." }]);
+            setSuggestions([{ title: manualBrief, description: "Analysis results for your specified career path." }]);
         } else {
-            typeMessage("Thank you for your responses. Analyzing your profile...");
+            typeMessage("Synthesizing your cognitive profile. Please standby for results...");
             silentSubmit(userAnswers);
         }
     }, [currentQuestionIndex, isManualPath, manualBrief]);
 
-    const playMessageSound = () => {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
-
-        try {
-            const ctx = new AudioContext();
-
-            // 1. Mechanical 'Impact' (White Noise burst)
-            const bufferSize = ctx.sampleRate * 0.04;
-            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
-
-            const noiseSource = ctx.createBufferSource();
-            noiseSource.buffer = buffer;
-
-            const noiseGain = ctx.createGain();
-            noiseGain.gain.setValueAtTime(0.04, ctx.currentTime);
-            noiseGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
-
-            const noiseFilter = ctx.createBiquadFilter();
-            noiseFilter.type = 'bandpass';
-            noiseFilter.frequency.value = 1200;
-            noiseFilter.Q.value = 1;
-
-            noiseSource.connect(noiseFilter);
-            noiseFilter.connect(noiseGain);
-            noiseGain.connect(ctx.destination);
-
-            // 2. Short metallic resonance (Triangle)
-            const oscillator = ctx.createOscillator();
-            const resGain = ctx.createGain();
-
-            oscillator.type = 'triangle';
-            oscillator.frequency.setValueAtTime(2000, ctx.currentTime);
-            oscillator.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.02);
-
-            resGain.gain.setValueAtTime(0.01, ctx.currentTime);
-            resGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.02);
-
-            oscillator.connect(resGain);
-            resGain.connect(ctx.destination);
-
-            noiseSource.start();
-            oscillator.start();
-            oscillator.stop(ctx.currentTime + 0.04);
-        } catch (e) {
-            console.error("Audio context error:", e);
-        }
-    };
-
     const typeMessage = async (text) => {
         setIsTyping(true);
         setTypingText('');
-
-        // Initial delay
-        await new Promise(resolve => setTimeout(resolve, 600));
+        await new Promise(resolve => setTimeout(resolve, 400));
 
         let currentText = '';
         for (let i = 0; i < text.length; i++) {
             currentText += text[i];
             setTypingText(currentText);
-
-            // Play sound every few characters for a "printing" effect
-            if (i % 3 === 0) playMessageSound();
-
-            // Randomize typing speed for organic feel
-            const speed = Math.random() * 30 + 20;
+            const speed = Math.random() * 20 + 10;
             await new Promise(resolve => setTimeout(resolve, speed));
         }
 
-        // Move completed message to state
         setMessages(prev => [...prev, { sender: 'ai', text }]);
         setTypingText('');
         setIsTyping(false);
@@ -211,16 +132,13 @@ const ChatInterface = () => {
 
     const submitAnswer = (value) => {
         if (isManualPath && currentQuestionIndex >= sessionQuestions.length) {
-            // Show user message first
             setMessages(prev => [...prev, { sender: 'user', text: value }]);
             setInputValue('');
-
-            // Artificial delay for "processing" feel before gating
             setIsAnalyzing(true);
             setTimeout(() => {
                 setIsAnalyzing(false);
                 setManualBrief(value);
-            }, 1000);
+            }, 1200);
             return;
         }
 
@@ -233,8 +151,6 @@ const ChatInterface = () => {
         }));
 
         setInputValue('');
-
-        // Move to next question after a small lag
         setTimeout(() => {
             setCurrentQuestionIndex(prev => prev + 1);
         }, 300);
@@ -249,23 +165,20 @@ const ChatInterface = () => {
     if (suggestions.length > 0) {
         if (!isSignedUp) {
             return (
-                <div className="results-container gate-container">
+                <div className="results-container gate-container premium-container">
                     <div className="gate-content">
-                        <div className="success-icon">✓</div>
                         <h2 className="gate-title">Analysis Complete</h2>
-                        <p className="gate-subtitle">Your personalized career roadmap is ready for decryption.</p>
+                        <p className="gate-subtitle">Your comprehensive career architect profile is ready.</p>
 
                         <div className="premium-lock-box">
-                            <div className="lock-icon">🔒</div>
-                            <p>We've analyzed your logical, numerical, and verbal patterns to find your top 5 matching careers.</p>
+                            <p>We've synthesized your logical, numerical, and verbal patterns to identify your peak potential trajectories.</p>
                         </div>
 
                         <div className="gate-cta-box">
-                            <p className="cta-text">Join ProDecide to unlock your full profile</p>
-                            <button className="cta-button signup-button" onClick={() => setIsSignedUp(true)}>
-                                Sign Up to View Results
+                            <button className="cta-button" onClick={() => setIsSignedUp(true)}>
+                                Access Results
                             </button>
-                            <span className="cta-subtext">Free immediate access to your analysis</span>
+                            <span className="cta-subtext">Immediate secure access to your profile</span>
                         </div>
                     </div>
                 </div>
@@ -273,8 +186,10 @@ const ChatInterface = () => {
         }
 
         return (
-            <div className="results-container persona-container">
-                <h2 className="persona-title">{isManualPath ? "Your Specified Career" : "Your Career Roadmap"}</h2>
+            <div className="results-container premium-container">
+                <header className="results-header">
+                    <h2 className="persona-title">{isManualPath ? "Career Path Analysis" : "Strategic Roadmap"}</h2>
+                </header>
                 <div className="results-grid">
                     {suggestions.map((s, i) => (
                         <div key={i} className="result-card" style={{ animationDelay: `${i * 0.1}s` }}>
@@ -284,7 +199,7 @@ const ChatInterface = () => {
                     ))}
                 </div>
                 <div className="results-footer">
-                    <button className="cta-button" onClick={() => window.location.reload()}>Start New Session</button>
+                    <button className="cta-button" onClick={() => window.location.reload()}>Restart Session</button>
                 </div>
             </div>
         );
@@ -293,65 +208,50 @@ const ChatInterface = () => {
     const progress = Math.min((currentQuestionIndex / sessionQuestions.length) * 100, 100);
 
     const aptitudeIndicators = [
-        { label: "Logical reasoning", keys: ["logical_sudoku"] },
-        { label: "Numerical ability", keys: ["numerical_puzzle"] },
-        { label: "Verbal ability", keys: ["extracurriculars"] },
-        { label: "Abstract reasoning", keys: ["ideal_environment"] },
-        { label: "Spatial ability", keys: ["career_interests"] }
+        { label: "LOGICAL ANALYSIS", keys: ["logical_sudoku"] },
+        { label: "NUMERICAL INTELLIGENCE", keys: ["numerical_puzzle"] },
+        { label: "VERBAL PRECISION", keys: ["extracurriculars"] },
+        { label: "STRATEGIC VISION", keys: ["ideal_environment"] },
+        { label: "ADAPTABILITY INDEX", keys: ["career_interests"] }
     ];
 
     return (
-        <div className="chat-interface-container">
-            <div className="progress-container">
-                <div className="progress-bar" style={{ width: `${progress}%` }}></div>
-                <span className="progress-text">Session Data Collected: {Math.round(progress)}%</span>
-            </div>
-
+        <div className="chat-interface-container premium-container">
             <div className="chat-main-layout">
                 <div className="chat-window-wrapper">
                     <div className="chat-window">
-                        <div className="scanline"></div>
-
-                        {/* Display specific instructions/rules at the top if they exist for the current question */}
                         {sessionQuestions[currentQuestionIndex]?.instructions && (
                             <div className="system-instruction-box">
-                                <span className="system-tag">SYSTEM RULES</span>
+                                <span className="system-tag">PROTOCOL INSTRUCTIONS</span>
                                 <p>{sessionQuestions[currentQuestionIndex].instructions}</p>
                             </div>
                         )}
 
-                        {/* Only show the current AI message or typing state to 'hide' previous questions */}
-                        {isTyping ? (
-                            <div className="chat-message ai">
-                                <span className="message-prefix"><SiriWaveform /></span>
-                                <span className="message-text">{typingText}</span>
-                                <span className="typing-cursor">█</span>
+                        {messages.map((msg, idx) => (
+                            <div key={idx} className={`chat-message ${msg.sender}`}>
+                                <span className="message-prefix">{msg.sender === 'ai' ? 'PRODECIDE' : 'USER'}</span>
+                                <span className="message-text">{msg.text}</span>
                             </div>
-                        ) : (
-                            messages.length > 0 && (
-                                <div className={`chat-message ai`}>
-                                    <span className="message-prefix"><SiriWaveform /></span>
-                                    <span className="message-text">{messages[messages.length - 1].text}</span>
-                                </div>
-                            )
+                        ))}
+
+                        {isTyping && (
+                            <div className="chat-message ai">
+                                <span className="message-prefix">PRODECIDE</span>
+                                <span className="message-text">{typingText}</span>
+                                <span className="typing-cursor">_</span>
+                            </div>
                         )}
 
                         {isAnalyzing && (
                             <div className="chat-message ai">
                                 <span className="message-prefix">SYSTEM</span>
-                                <span className="message-text italic">Analyzing your digital profile... Matrix crunching data...</span>
-                                <div className="ai-waveform" style={{ marginLeft: '1rem', marginTop: '2px' }}>
-                                    <div className="bar"></div>
-                                    <div className="bar"></div>
-                                    <div className="bar"></div>
-                                </div>
+                                <span className="message-text">Synthesizing cognitive patterns...</span>
                             </div>
                         )}
                         <div ref={messagesEndRef} />
                     </div>
 
                     <div className="chat-control-wrapper">
-                        {/* Render options if they exist for the current question */}
                         {!isTyping && sessionQuestions[currentQuestionIndex]?.options && (
                             <div className="choice-options-container">
                                 {sessionQuestions[currentQuestionIndex].options.map((option, idx) => (
@@ -367,7 +267,6 @@ const ChatInterface = () => {
                         )}
 
                         <form onSubmit={handleSubmit} className="chat-input-area">
-                            <span className="input-prefix">{'>'}</span>
                             <input
                                 ref={inputRef}
                                 type="text"
@@ -375,34 +274,37 @@ const ChatInterface = () => {
                                 onChange={(e) => setInputValue(e.target.value)}
                                 className="chat-input"
                                 autoFocus
-                                placeholder={isTyping || isAnalyzing ? "..." : "Type your answer..."}
+                                placeholder={isTyping || isAnalyzing ? "Processing..." : "Enter response..."}
                                 disabled={isTyping || isAnalyzing || (currentQuestionIndex >= sessionQuestions.length && !isManualPath) || (isManualPath && manualBrief)}
                             />
                         </form>
 
                         {!isManualPath && currentQuestionIndex < sessionQuestions.length && !isTyping && (
-                            <div className="skip-action-container">
-                                <button className="skip-btn" onClick={handleSkipAssessment}>
-                                    I have something in mind
-                                </button>
-                            </div>
+                            <button className="skip-btn" onClick={handleSkipAssessment}>
+                                SPECIFY CAREER PATH MANUALLY
+                            </button>
                         )}
                     </div>
                 </div>
 
                 <div className="status-card">
-                    <div className="status-card-title">Aptitude Profile</div>
-                    {aptitudeIndicators.map((indicator, idx) => {
-                        const isCollected = indicator.keys.every(key => userAnswers[key]);
-                        return (
-                            <div key={idx} className="status-item">
-                                <span className="status-label">{indicator.label}</span>
-                                <span className={`status-indicator ${isCollected ? 'collected' : 'missing'}`}>
-                                    {isCollected ? 'ANALYZED' : 'PENDING'}
-                                </span>
-                            </div>
-                        );
-                    })}
+                    <div className="status-card-title">Cognitive Profile</div>
+                    <div className="mini-progress-track">
+                        <div className="mini-progress-bar" style={{ width: `${progress}%` }}></div>
+                    </div>
+                    <div className="aptitude-list">
+                        {aptitudeIndicators.map((indicator, idx) => {
+                            const isCollected = indicator.keys.every(key => userAnswers[key]);
+                            return (
+                                <div key={idx} className="status-item">
+                                    <span className="status-label">{indicator.label}</span>
+                                    <span className={`status-indicator ${isCollected ? 'collected' : 'missing'}`}>
+                                        {isCollected ? 'COMPLETE' : 'PENDING'}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
         </div>
