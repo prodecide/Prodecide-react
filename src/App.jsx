@@ -22,7 +22,7 @@ function App() {
     motivation: ''
   });
 
-  const consultants = [
+  const [consultants, setConsultants] = useState([
     {
       name: "Dr. Aris V.",
       role: "Strategic Career Analyst",
@@ -38,7 +38,7 @@ function App() {
       role: "Aptitude Architect",
       bio: "Focuses on unlocking latent cognitive potential through logic training."
     }
-  ];
+  ]);
 
   const handlePersonaSelect = (persona) => {
     if (persona === 'career') {
@@ -54,7 +54,15 @@ function App() {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    console.log("Consultant Application:", formData);
+
+    // Add new consultant to state
+    const newConsultant = {
+      name: formData.fullName,
+      role: formData.expertise,
+      bio: formData.bio
+    };
+
+    setConsultants(prev => [newConsultant, ...prev]);
     setFormSubmitted(true);
   };
 
