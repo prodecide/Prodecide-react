@@ -880,6 +880,122 @@
     opacity: 0.8;
 }
 
+/* Consultants View Styling */
+.consultants-view {
+    width: 90%;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sub-nav {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    border: 1px solid rgba(0, 255, 0, 0.2);
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+}
+
+.sub-tab {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+    padding: 0.2rem 0;
+}
+
+.sub-tab:hover {
+    opacity: 1;
+}
+
+.sub-tab.active {
+    opacity: 1;
+    color: #0f0;
+    text-shadow: 0 0 5px #0f0;
+}
+
+.consultants-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    width: 100%;
+}
+
+.consultant-card {
+    position: relative;
+    background: rgba(0, 20, 0, 0.8);
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    padding: 2rem;
+    border-radius: 10px;
+    text-align: left;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.consultant-card:hover {
+    border-color: #0f0;
+    transform: translateY(-5px);
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+}
+
+.consultant-name {
+    color: #fff;
+    font-size: 1.4rem;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: 1px;
+}
+
+.consultant-role {
+    display: block;
+    color: #0f0;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    letter-spacing: 1.5px;
+}
+
+.consultant-bio {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.join-us-section {
+    max-width: 600px;
+    padding: 3rem;
+    background: rgba(0, 40, 0, 0.4);
+    border: 2px dashed rgba(0, 255, 0, 0.3);
+    border-radius: 20px;
+}
+
+.section-title {
+    font-size: 2rem;
+    color: #fff;
+    margin-bottom: 1.5rem;
+}
+
+.section-text {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.cta-button.mini {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    animation: none;
+}
+
 .skip-action-container {
     margin-top: 1rem;
     display: flex;

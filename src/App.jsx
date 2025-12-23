@@ -7,6 +7,25 @@ import ChatInterface from './components/ChatInterface';
 function App() {
   const [view, setView] = useState('landing');
   const [activeTab, setActiveTab] = useState('decide');
+  const [consultantTab, setConsultantTab] = useState('list');
+
+  const consultants = [
+    {
+      name: "Dr. Aris V.",
+      role: "Strategic Career Analyst",
+      bio: "Expert in mapping psychological patterns to future-proof career paths."
+    },
+    {
+      name: "Neo Spectra",
+      role: "Digital Systems Guide",
+      bio: "Specializes in technology shifts and emerging high-impact markets."
+    },
+    {
+      name: "Trinity M.",
+      role: "Aptitude Architect",
+      bio: "Focuses on unlocking latent cognitive potential through logic training."
+    }
+  ];
 
   const handlePersonaSelect = (persona) => {
     if (persona === 'career') {
@@ -89,9 +108,43 @@ function App() {
               </button>
             </>
           ) : activeTab === 'consultants' ? (
-            <div className="tab-content">
-              <h2 className="tab-title">Our Consultants</h2>
-              <p className="tab-text">Expert guidance for your career journey.</p>
+            <div className="tab-content consultants-view">
+              <div className="sub-nav">
+                <button
+                  className={`sub-tab ${consultantTab === 'list' ? 'active' : ''}`}
+                  onClick={() => setConsultantTab('list')}
+                >
+                  Consultants
+                </button>
+                <button
+                  className={`sub-tab ${consultantTab === 'join' ? 'active' : ''}`}
+                  onClick={() => setConsultantTab('join')}
+                >
+                  Join Us
+                </button>
+              </div>
+
+              {consultantTab === 'list' ? (
+                <div className="consultants-grid">
+                  {consultants.map((c, i) => (
+                    <div key={i} className="consultant-card">
+                      <div className="card-glitch-overlay"></div>
+                      <h3 className="consultant-name">{c.name}</h3>
+                      <span className="consultant-role">{c.role}</span>
+                      <p className="consultant-bio">{c.bio}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="join-us-section">
+                  <h3 className="section-title">Become a ProDecide Guide</h3>
+                  <p className="section-text">
+                    Are you an expert in human potential or career analysis? <br />
+                    Join our network of elite consultants to help users decrypt their future.
+                  </p>
+                  <button className="cta-button mini">Apply to Join</button>
+                </div>
+              )}
             </div>
           ) : activeTab === 'about' ? (
             <div className="tab-content">
