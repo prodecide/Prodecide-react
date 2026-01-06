@@ -40,6 +40,7 @@ function App() {
     }
   ]);
 
+
   const handlePersonaSelect = (persona) => {
     if (persona === 'career') {
       setView('chat-career');
@@ -221,9 +222,25 @@ function App() {
                 )}
               </div>
             ) : activeTab === 'about' ? (
-              <div className="tab-content">
-                <h2 className="tab-title">About Us</h2>
-                <p className="tab-text">Innovating decision making through technology.</p>
+              <div className="tab-content about-view premium-container">
+                <h2 className="tab-title">About ProDecide</h2>
+                <div className="about-grid">
+                  <div className="about-card">
+                    <div className="icon-circle">M</div>
+                    <h3>Our Mission</h3>
+                    <p>Decrypting human potential by mapping cognitive patterns to high-impact career paths.</p>
+                  </div>
+                  <div className="about-card">
+                    <div className="icon-circle">V</div>
+                    <h3>Our Vision</h3>
+                    <p>A future where decision intelligence empowers every individual to find their peak alignment.</p>
+                  </div>
+                  <div className="about-card full-width">
+                    <div className="icon-circle">⚡</div>
+                    <h3>The Methodology</h3>
+                    <p>ProDecide leverages advanced digital intelligence and strategic analysis to provide a clear roadmap for your professional future. We combine psychological profiling with market trends to ensure your career choice is not just a decision, but a strategic move.</p>
+                  </div>
+                </div>
               </div>
             ) : null
           ) : view === 'personas' ? (

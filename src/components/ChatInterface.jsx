@@ -23,6 +23,15 @@ const sessionQuestions = [
     { key: "primary_motivation", text: "What matters more to you right now? (Passion / Salary / Social impact / Work-life balance)" }
 ];
 
+const AIIndicator = () => (
+    <div className="ai-indicator-wrapper">
+        <div className="ai-bubble">
+            <div className="ai-bubble-inner"></div>
+            <div className="ai-bubble-pulse"></div>
+        </div>
+    </div>
+);
+
 const ChatInterface = () => {
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
@@ -229,14 +238,16 @@ const ChatInterface = () => {
 
                         {messages.map((msg, idx) => (
                             <div key={idx} className={`chat-message ${msg.sender}`}>
-                                <span className="message-prefix">{msg.sender === 'ai' ? 'PRODECIDE' : 'USER'}</span>
+                                <span className="message-prefix">
+                                    {msg.sender === 'ai' ? <AIIndicator /> : 'USER'}
+                                </span>
                                 <span className="message-text">{msg.text}</span>
                             </div>
                         ))}
 
                         {isTyping && (
                             <div className="chat-message ai">
-                                <span className="message-prefix">PRODECIDE</span>
+                                <span className="message-prefix"><AIIndicator /></span>
                                 <span className="message-text">{typingText}</span>
                                 <span className="typing-cursor">_</span>
                             </div>
@@ -244,7 +255,7 @@ const ChatInterface = () => {
 
                         {isAnalyzing && (
                             <div className="chat-message ai">
-                                <span className="message-prefix">SYSTEM</span>
+                                <span className="message-prefix"><AIIndicator /></span>
                                 <span className="message-text">Synthesizing cognitive patterns...</span>
                             </div>
                         )}
