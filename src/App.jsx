@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import MatrixRain from './components/MatrixRain';
 import PersonaSelection from './components/PersonaSelection';
@@ -22,23 +22,42 @@ function App() {
     motivation: ''
   });
 
-  const [consultants, setConsultants] = useState([
-    {
-      name: "Dr. Aris V.",
-      role: "Strategic Career Analyst",
-      bio: "Expert in mapping psychological patterns to future-proof career paths."
-    },
-    {
-      name: "Neo Spectra",
-      role: "Digital Systems Guide",
-      bio: "Specializes in technology shifts and emerging high-impact markets."
-    },
-    {
-      name: "Trinity M.",
-      role: "Aptitude Architect",
-      bio: "Focuses on unlocking latent cognitive potential through logic training."
+  const [consultants, setConsultants] = useState([]);
+
+  useEffect(() => {
+    fetchConsultants();
+  }, []);
+
+  const fetchConsultants = async () => {
+    try {
+      const response = await fetch('/api/consultants');
+      const data = await response.json();
+      if (Array.isArray(data) && data.length > 0) {
+        setConsultants(data);
+      } else {
+        // Fallback to default if no data in DB
+        setConsultants([
+          {
+            name: "Dr. Aris V.",
+            role: "Strategic Career Analyst",
+            bio: "Expert in mapping psychological patterns to future-proof career paths."
+          },
+          {
+            name: "Neo Spectra",
+            role: "Digital Systems Guide",
+            bio: "Specializes in technology shifts and emerging high-impact markets."
+          },
+          {
+            name: "Trinity M.",
+            role: "Aptitude Architect",
+            bio: "Focuses on unlocking latent cognitive potential through logic training."
+          }
+        ]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch consultants:', error);
     }
-  ]);
+  };
 
 
   const handlePersonaSelect = (persona) => {
@@ -53,18 +72,32 @@ function App() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    // Add new consultant to state
     const newConsultant = {
       name: formData.fullName,
       role: formData.expertise,
       bio: formData.bio
     };
 
-    setConsultants(prev => [newConsultant, ...prev]);
-    setFormSubmitted(true);
+    try {
+      const response = await fetch('/api/consultants', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newConsultant)
+      });
+
+      if (response.ok) {
+        const savedConsultant = await response.json();
+        setConsultants(prev => [savedConsultant, ...prev]);
+        setFormSubmitted(true);
+      } else {
+        console.error('Failed to save consultant');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    }
   };
 
   return (
