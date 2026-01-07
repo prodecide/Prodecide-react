@@ -228,12 +228,12 @@ function App() {
                   <div className="about-card">
                     <div className="icon-circle">M</div>
                     <h3>Our Mission</h3>
-                    <p>Decrypting human potential by mapping cognitive patterns to high-impact career paths.</p>
+                    <p>To help people make informed decisions through simple, personalized, and intelligent guidance.</p>
                   </div>
                   <div className="about-card">
                     <div className="icon-circle">V</div>
                     <h3>Our Vision</h3>
-                    <p>A future where decision intelligence empowers every individual to find their peak alignment.</p>
+                    <p>To empower people everywhere to make better decisions and take control of their future.</p>
                   </div>
                   <div className="about-card full-width">
                     <div className="icon-circle">⚡</div>
