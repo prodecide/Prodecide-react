@@ -76,6 +76,7 @@ function App() {
     e.preventDefault();
 
     const newConsultant = {
+      ...formData,
       name: formData.fullName,
       role: formData.expertise,
       bio: formData.bio
@@ -178,7 +179,16 @@ function App() {
                         <div className="card-glitch-overlay"></div>
                         <h3 className="consultant-name">{c.name}</h3>
                         <span className="consultant-role">{c.role}</span>
+                        <div className="consultant-meta">
+                          {c.experience && <span className="meta-tag">{c.experience} Years Exp</span>}
+                          {c.location && <span className="meta-tag">{c.location}</span>}
+                        </div>
                         <p className="consultant-bio">{c.bio}</p>
+                        {c.linkedin && (
+                          <a href={c.linkedin} target="_blank" rel="noopener noreferrer" className="linkedin-link">
+                            View Profile →
+                          </a>
+                        )}
                       </div>
                     ))}
                   </div>

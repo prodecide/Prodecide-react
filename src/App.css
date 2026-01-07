@@ -151,13 +151,16 @@ body {
 }
 
 .content-area {
-    flex: 1;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
     padding: 100px 5% 60px;
-    min-height: 100vh;
+    min-height: 100%;
+    /* Changed from 100vh to allow growth */
+    box-sizing: border-box;
+    overflow-y: visible;
+    /* Ensure content can overflow the container */
 }
 
 /* Hero Section */
@@ -662,6 +665,8 @@ body {
 /* Consultants View Styling */
 .consultants-view {
     width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .sub-nav {
@@ -730,6 +735,41 @@ body {
     color: var(--text-secondary);
     line-height: 1.7;
     font-size: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.consultant-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+}
+
+.meta-tag {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    padding: 0.3rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+}
+
+.linkedin-link {
+    display: inline-block;
+    color: var(--accent-emerald);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid transparent;
+}
+
+.linkedin-link:hover {
+    letter-spacing: 0.05rem;
+    border-bottom-color: var(--accent-emerald);
 }
 
 /* Form Styles */
@@ -737,7 +777,7 @@ body {
     max-width: 800px;
     margin: 0 auto;
     text-align: left;
-    padding-bottom: 4rem;
+    padding-bottom: 2rem;
 }
 
 .form-grid {
