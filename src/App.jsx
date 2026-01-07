@@ -235,11 +235,6 @@ function App() {
                     <h3>Our Vision</h3>
                     <p>To empower people everywhere to make better decisions and take control of their future.</p>
                   </div>
-                  <div className="about-card full-width">
-                    <div className="icon-circle">⚡</div>
-                    <h3>The Methodology</h3>
-                    <p>ProDecide leverages advanced digital intelligence and strategic analysis to provide a clear roadmap for your professional future. We combine psychological profiling with market trends to ensure your career choice is not just a decision, but a strategic move.</p>
-                  </div>
                 </div>
               </div>
             ) : null
