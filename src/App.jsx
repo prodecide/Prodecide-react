@@ -248,7 +248,7 @@ function App() {
                             <input type="text" name="motivation" value={formData.motivation} onChange={handleFormChange} required placeholder="I want to help people make better career choices." />
                           </div>
                         </div>
-                        <button type="submit" className="cta-button mini submit-form-btn">Submit</button>
+                        <button type="submit" className="cta-button submit-form-btn">Submit Application</button>
                       </form>
                     )}
                   </div>

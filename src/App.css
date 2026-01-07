@@ -155,8 +155,9 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 80px 5% 40px;
+    justify-content: flex-start;
+    padding: 100px 5% 60px;
+    min-height: 100vh;
 }
 
 /* Hero Section */
@@ -736,6 +737,7 @@ body {
     max-width: 800px;
     margin: 0 auto;
     text-align: left;
+    padding-bottom: 4rem;
 }
 
 .form-grid {
@@ -952,6 +954,7 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
+
 /* About Us View Styling */
 .about-view {
     width: 100%;

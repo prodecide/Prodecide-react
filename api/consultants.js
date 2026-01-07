@@ -9,7 +9,9 @@ module.exports = async (req, res) => {
     }
 
     try {
-        await client.connect();
+        if (!client.topology || !client.topology.isConnected()) {
+            await client.connect();
+        }
         const database = client.db('prodecide');
         const consultants = database.collection('consultants');
 
