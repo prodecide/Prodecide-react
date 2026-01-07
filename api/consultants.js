@@ -1,14 +1,18 @@
 const { MongoClient } = require('mongodb');
 
 const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri);
+let client;
 
 module.exports = async (req, res) => {
     if (!uri) {
-        return res.status(500).json({ error: 'MONGODB_URI is not set' });
+        return res.status(500).json({ error: 'MONGODB_URI environment variable is missing. Please add it to your Vercel project.' });
     }
 
     try {
+        if (!client) {
+            client = new MongoClient(uri);
+        }
+
         if (!client.topology || !client.topology.isConnected()) {
             await client.connect();
         }
