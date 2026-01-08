@@ -1,9 +1,10 @@
 import { MongoClient } from 'mongodb';
 
-const uri = process.env.MONGODB_URI;
 let client;
 
 export default async function handler(req, res) {
+    const uri = process.env.MONGODB_URI;
+
     if (!uri) {
         return res.status(500).json({ error: 'MONGODB_URI environment variable is missing. Please add it to your Vercel project.' });
     }
