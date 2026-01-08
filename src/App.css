@@ -154,12 +154,10 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 100px 5% 60px;
-    min-height: 100%;
-    /* Changed from 100vh to allow growth */
+    padding: 120px 5% 80px;
+    min-height: 100vh;
     box-sizing: border-box;
     overflow-y: visible;
-    /* Ensure content can overflow the container */
 }
 
 /* Hero Section */
@@ -664,7 +662,8 @@ body {
 /* Consultants View Styling */
 .consultants-view {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1200px !important;
+    /* Ensure it overrides .tab-content */
     margin: 0 auto;
 }
 

@@ -1,9 +1,9 @@
-const { MongoClient } = require('mongodb');
+import { MongoClient } from 'mongodb';
 
 const uri = process.env.MONGODB_URI;
 let client;
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
     if (!uri) {
         return res.status(500).json({ error: 'MONGODB_URI environment variable is missing. Please add it to your Vercel project.' });
     }
@@ -11,11 +11,9 @@ module.exports = async (req, res) => {
     try {
         if (!client) {
             client = new MongoClient(uri);
-        }
-
-        if (!client.topology || !client.topology.isConnected()) {
             await client.connect();
         }
+
         const database = client.db('prodecide');
         const consultants = database.collection('consultants');
 
@@ -38,6 +36,6 @@ module.exports = async (req, res) => {
         return res.status(405).json({ error: 'Method not allowed' });
     } catch (error) {
         console.error('Database operation failed:', error);
-        return res.status(500).json({ error: 'Internal Server Error' });
+        return res.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
-};
+}
