@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import consultantsHandler from './api/consultants.js';
 import analyzeHandler from './api/analyze.js';
 
-// Load environment variables from .env.local
+// Load environment variables from.env.local
 const result = dotenv.config({ path: '.env.local' });
 if (result.error) {
     console.warn("Warning: .env.local file not found or could not be read.");

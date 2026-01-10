@@ -81,6 +81,7 @@ function App() {
       role: formData.expertise,
       bio: formData.bio
     };
+    console.log(newConsultant);
 
     try {
       const response = await fetch('/api/consultants', {
