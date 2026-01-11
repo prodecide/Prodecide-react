@@ -68,10 +68,14 @@
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 6px;
-    padding: 1rem;
+    padding: 1.2rem;
+    /* Increased padding */
     color: #fff;
     font-family: inherit;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    /* Bigger font */
+    font-weight: 500;
+    /* Bolder text */
     transition: all 0.3s ease;
 }
 
@@ -86,7 +90,10 @@
 
 .form-group input::placeholder,
 .form-group textarea::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.2);
+    /* Greyed out placeholder */
+    font-weight: 400;
+    /* Lighter weight for placeholder */
 }
 
 /* Custom Dropdown Styles */
