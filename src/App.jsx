@@ -114,7 +114,7 @@ function AppWithRouter() {
   const location = useLocation();
 
   // Determine if header should be visible
-  const showHeader = !['/chat/career'].includes(location.pathname);
+  const showHeader = true;
 
   const getActiveTab = (path) => {
     if (path === '/') return 'decide';
@@ -136,7 +136,7 @@ function AppWithRouter() {
               <span className="brand-dot"></span>
               ProDecide
             </Link>
-            {!['/start'].includes(location.pathname) && (
+            {!['/start', '/chat/career'].includes(location.pathname) && (
               <nav className="nav-tabs">
                 <Link
                   to="/"

@@ -1,19 +1,94 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../App.css';
 
+// Helper component for puzzle shapes
+const PuzzleShape = ({ type }) => {
+    switch (type) {
+        case 'triangle':
+            return (
+                <svg viewBox="0 0 24 24" className="shape-svg shape-triangle">
+                    <path d="M12 4L22 20H2z" fill="currentColor" />
+                </svg>
+            );
+        case 'circle':
+            return (
+                <svg viewBox="0 0 24 24" className="shape-svg shape-circle">
+                    <circle cx="12" cy="12" r="9" fill="transparent" strokeWidth="3" stroke="currentColor" />
+                </svg>
+            );
+        case 'square':
+            return (
+                <svg viewBox="0 0 24 24" className="shape-svg shape-square">
+                    <rect x="5" y="5" width="14" height="14" rx="2" fill="currentColor" />
+                </svg>
+            );
+        case '?':
+            return <span className="shape-question">?</span>;
+        default:
+            return null;
+    }
+};
+
 const sessionQuestions = [
     { key: "name", text: "What is your name?" },
     { key: "education_level", text: "Your current class or qualification?", options: ["10th", "12th", "UG"] },
     {
         key: "logical_sudoku",
-        text: "Let's solve a quick puzzle!\n🔺   ⬛   ⭕\n⭕   🔺   ?\n⬛   ⭕   🔺\n👉 Which shape follows the pattern?",
+        type: "grid_puzzle",
+        text: "Let's solve a quick puzzle! Which shape follows the pattern?",
+        grid: [
+            ["triangle", "square", "circle"],
+            ["circle", "triangle", "?"],
+            ["square", "circle", "triangle"]
+        ],
         instructions: "RULES: Each shape appears once per row. Each shape appears once per column.",
-        options: ["🔺", "⬛", "⭕"]
+        options: ["triangle", "square", "circle"]
     },
     {
         key: "numerical_puzzle",
-        text: "Let’s try a quick number puzzle 👇\n\n🔵 + 🔵 = 10\n🔵 + 🔺 = 8\n🔺 + ⬛ = 7\n\n👉 What number does ⬛ represent?",
+        type: "equation_puzzle",
+        text: "Let's try a quick number puzzle. What number does the square represent?",
+        equations: [
+            ["circle", "+", "circle", "=", "10"],
+            ["circle", "+", "triangle", "=", "8"],
+            ["triangle", "+", "square", "=", "7"]
+        ],
+        instructions: "Solve the equations to find the value of the square.",
         options: ["1", "2", "3", "4"]
+    },
+    {
+        key: "verbal_precision_1",
+        type: "multi_choice_assessment",
+        title: "Verbal Precision (1/2)",
+        questions: [
+            {
+                id: "q1",
+                text: "Q1. Contextual Vocabulary (Core): The instructions were so ______ that everyone followed them without confusion.",
+                options: ["A. ambiguous", "B. concise", "C. excessive", "D. careless"]
+            },
+            {
+                id: "q2",
+                text: "Q2. Sentence Correctness (High Signal): Identify the sentence that is grammatically and semantically correct:",
+                options: ["A. She did not knew the answer.", "B. He explained the concept clearly.", "C. The results was surprising.", "D. They was waiting outside."]
+            }
+        ]
+    },
+    {
+        key: "verbal_precision_2",
+        type: "multi_choice_assessment",
+        title: "Verbal Precision (2/2)",
+        questions: [
+            {
+                id: "q3",
+                text: "Q3. Word Usage in Context: Choose the sentence where the word “critical” is used most accurately:",
+                options: ["A. The weather is critical today.", "B. He made a critical error during the test.", "C. The book was critical to read.", "D. She spoke critical because she was happy."]
+            },
+            {
+                id: "q4",
+                text: "Q4. Precision vs Approximation: Which sentence is the most precise?",
+                options: ["A. The meeting was long.", "B. The meeting took some time.", "C. The meeting lasted 47 minutes.", "D. The meeting felt endless."]
+            }
+        ]
     },
     { key: "extracurriculars", text: "What activities excite you outside academics? (e.g., coding, writing, designing, debating, sports)" },
     { key: "learning_preference", text: "Do you prefer theoretical learning or practical, hands-on work?" },
@@ -45,6 +120,7 @@ const ChatInterface = () => {
     const [inputValue, setInputValue] = useState('');
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [userAnswers, setUserAnswers] = useState({});
+    const [assessmentAnswers, setAssessmentAnswers] = useState({});
     const [isTyping, setIsTyping] = useState(false);
     const [typingText, setTypingText] = useState('');
     const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -182,6 +258,30 @@ const ChatInterface = () => {
         submitAnswer(inputValue);
     };
 
+    const handleAssessmentSelect = (questionId, option) => {
+        setAssessmentAnswers(prev => ({
+            ...prev,
+            [questionId]: option
+        }));
+    };
+
+    const handleAssessmentSubmit = () => {
+        const currentQ = sessionQuestions[currentQuestionIndex];
+        const answers = {};
+        currentQ.questions.forEach(q => {
+            answers[q.id] = assessmentAnswers[q.id];
+        });
+
+        // Add to user answers
+        setUserAnswers(prev => ({
+            ...prev,
+            ...answers
+        }));
+
+        setAssessmentAnswers({}); // Reset for next set if needed
+        setCurrentQuestionIndex(prev => prev + 1);
+    };
+
     if (suggestions.length > 0) {
         if (!isSignedUp) {
             return (
@@ -242,64 +342,133 @@ const ChatInterface = () => {
                     <div className="chat-window">
                         {sessionQuestions[currentQuestionIndex]?.instructions && (
                             <div className="system-instruction-box">
-                                <span className="system-tag">PROTOCOL INSTRUCTIONS</span>
+                                <span className="system-tag">INSTRUCTIONS</span>
                                 <p>{sessionQuestions[currentQuestionIndex].instructions}</p>
                             </div>
                         )}
 
-                        {messages.map((msg, idx) => (
-                            <div key={idx} className={`chat-message ${msg.sender}`}>
-                                <span className="message-prefix">
-                                    {msg.sender === 'ai' ? <AIIndicator /> : <UserIndicator />}
-                                </span>
-                                <span className="message-text">{msg.text}</span>
+                        {sessionQuestions[currentQuestionIndex]?.type === 'grid_puzzle' ? (
+                            <div className="puzzle-container">
+                                <div className="puzzle-question">{sessionQuestions[currentQuestionIndex].text}</div>
+                                <div className="puzzle-grid">
+                                    {sessionQuestions[currentQuestionIndex].grid.flat().map((cell, idx) => (
+                                        <div key={idx} className={`puzzle-cell ${cell === '?' ? 'question-mark' : ''}`}>
+                                            <PuzzleShape type={cell} />
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        ))}
+                        ) : sessionQuestions[currentQuestionIndex]?.type === 'equation_puzzle' ? (
+                            <div className="puzzle-container">
+                                <div className="puzzle-question">{sessionQuestions[currentQuestionIndex].text}</div>
+                                <div className="puzzle-equations">
+                                    {sessionQuestions[currentQuestionIndex].equations.map((eq, i) => (
+                                        <div key={i} className="equation-row">
+                                            {eq.map((item, j) => (
+                                                <span key={j} className="equation-item">
+                                                    {['circle', 'triangle', 'square'].includes(item) ? (
+                                                        <PuzzleShape type={item} />
+                                                    ) : (
+                                                        <span className="equation-operator">{item}</span>
+                                                    )}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : sessionQuestions[currentQuestionIndex]?.type === 'multi_choice_assessment' ? (
+                            <div className="assessment-container">
+                                {sessionQuestions[currentQuestionIndex].questions.map((q, i) => (
+                                    <div key={i} className="assessment-card">
+                                        <div className="assessment-question-text">{q.text}</div>
+                                        <div className="assessment-options-grid">
+                                            {q.options.map((opt, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    className={`assessment-option ${assessmentAnswers[q.id] === opt ? 'selected' : ''}`}
+                                                    onClick={() => handleAssessmentSelect(q.id, opt)}
+                                                >
+                                                    {opt}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <>
+                                {messages.map((msg, idx) => (
+                                    <div key={idx} className={`chat-message ${msg.sender}`}>
+                                        <span className="message-prefix">
+                                            {msg.sender === 'ai' ? <AIIndicator /> : <UserIndicator />}
+                                        </span>
+                                        <span className="message-text">{msg.text}</span>
+                                    </div>
+                                ))}
 
-                        {isTyping && (
-                            <div className="chat-message ai">
-                                <span className="message-prefix"><AIIndicator /></span>
-                                <span className="message-text">{typingText}</span>
-                                <span className="typing-cursor">_</span>
-                            </div>
-                        )}
+                                {isTyping && (
+                                    <div className="chat-message ai">
+                                        <span className="message-prefix"><AIIndicator /></span>
+                                        <span className="message-text">{typingText}</span>
+                                        <span className="typing-cursor">_</span>
+                                    </div>
+                                )}
 
-                        {isAnalyzing && (
-                            <div className="chat-message ai">
-                                <span className="message-prefix"><AIIndicator /></span>
-                                <span className="message-text">Synthesizing cognitive patterns...</span>
-                            </div>
+                                {isAnalyzing && (
+                                    <div className="chat-message ai">
+                                        <span className="message-prefix"><AIIndicator /></span>
+                                        <span className="message-text">Synthesizing cognitive patterns...</span>
+                                    </div>
+                                )}
+                                <div ref={messagesEndRef} />
+                            </>
                         )}
-                        <div ref={messagesEndRef} />
                     </div>
 
                     <div className="chat-control-wrapper">
                         {!isTyping && sessionQuestions[currentQuestionIndex]?.options && (
-                            <div className="choice-options-container">
+                            <div className={`choice-options-container ${['grid_puzzle', 'equation_puzzle'].includes(sessionQuestions[currentQuestionIndex].type) ? 'puzzle-options' : ''}`}>
                                 {sessionQuestions[currentQuestionIndex].options.map((option, idx) => (
                                     <button
                                         key={idx}
                                         className="choice-button"
                                         onClick={() => handleChoiceSelect(option)}
                                     >
-                                        {option}
+                                        {['triangle', 'square', 'circle'].includes(option) ? (
+                                            <PuzzleShape type={option} />
+                                        ) : (
+                                            option
+                                        )}
                                     </button>
                                 ))}
                             </div>
                         )}
 
-                        <form onSubmit={handleSubmit} className="chat-input-area">
-                            <input
-                                ref={inputRef}
-                                type="text"
-                                value={inputValue}
-                                onChange={(e) => setInputValue(e.target.value)}
-                                className="chat-input"
-                                autoFocus
-                                placeholder={isTyping || isAnalyzing ? "Processing..." : "Enter response..."}
-                                disabled={isTyping || isAnalyzing || (currentQuestionIndex >= sessionQuestions.length && !isManualPath) || (isManualPath && manualBrief)}
-                            />
-                        </form>
+                        {sessionQuestions[currentQuestionIndex]?.type === 'multi_choice_assessment' && (
+                            <button
+                                className="assessment-submit-btn control-area-btn"
+                                onClick={handleAssessmentSubmit}
+                                disabled={sessionQuestions[currentQuestionIndex].questions.some(q => !assessmentAnswers[q.id])}
+                            >
+                                CONTINUE
+                            </button>
+                        )}
+
+                        {sessionQuestions[currentQuestionIndex]?.type !== 'multi_choice_assessment' && (
+                            <form onSubmit={handleSubmit} className="chat-input-area">
+                                <input
+                                    ref={inputRef}
+                                    type="text"
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    className="chat-input"
+                                    autoFocus
+                                    placeholder={isTyping || isAnalyzing ? "Processing..." : "Enter response..."}
+                                    disabled={isTyping || isAnalyzing || (currentQuestionIndex >= sessionQuestions.length && !isManualPath) || (isManualPath && manualBrief)}
+                                />
+                            </form>
+                        )}
 
                         {!isManualPath && currentQuestionIndex < sessionQuestions.length && !isTyping && (
                             <button className="skip-btn" onClick={handleSkipAssessment}>

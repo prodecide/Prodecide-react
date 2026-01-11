@@ -438,6 +438,8 @@ body {
     color: #ef4444;
 }
 
+
+
 .chat-window {
     flex: 1;
     overflow-y: auto;
@@ -520,8 +522,10 @@ body {
     background: rgba(0, 255, 136, 0.05);
     border: 1px solid rgba(0, 255, 136, 0.1);
     border-radius: 12px;
-    padding: 1.2rem;
-    margin-bottom: 2rem;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    margin-top: 0.5rem;
+    /* Added spacing from top */
     position: relative;
     border-left: 4px solid var(--accent-emerald);
 }
@@ -1079,6 +1083,7 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
 /* User Indicator Styles */
 .user-indicator-wrapper {
     display: flex;
@@ -1115,9 +1120,248 @@ body {
         height: 100%;
         opacity: 0.8;
     }
+
     100% {
         width: 250%;
         height: 250%;
         opacity: 0;
     }
+}
+
+/* Puzzle Grid Styles - Updated for Shapes */
+.puzzle-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    /* Allow flexible height */
+    width: 100%;
+    animation: fadeIn 0.5s ease;
+    padding: 1rem 0;
+}
+
+.puzzle-question {
+    font-size: 1.2rem;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    max-width: 80%;
+}
+
+.puzzle-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    background: rgba(20, 20, 20, 0.6);
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.puzzle-cell {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(30, 30, 30, 0.8);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: transform 0.2s ease;
+}
+
+.puzzle-cell:hover {
+    transform: scale(1.05);
+}
+
+.shape-svg {
+    width: 22px;
+    height: 22px;
+}
+
+.shape-triangle {
+    color: #ff0060;
+    /* Squid Game Pink/Red */
+    filter: drop-shadow(0 0 5px rgba(255, 0, 96, 0.5));
+}
+
+.shape-circle {
+    color: #ff0060;
+    filter: drop-shadow(0 0 5px rgba(255, 0, 96, 0.5));
+}
+
+.shape-square {
+    color: #242424;
+    /* Dark Grey/Black */
+    fill: #242424;
+    stroke: rgba(255, 255, 255, 0.2);
+    stroke-width: 1px;
+    filter: drop-shadow(0 0 5px rgba(36, 36, 36, 0.5));
+}
+
+.shape-question {
+    font-size: 1.8rem;
+    color: #fff;
+    font-weight: 300;
+}
+
+.puzzle-cell.question-mark {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Equation Puzzle Styles */
+.puzzle-equations {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: rgba(20, 20, 20, 0.6);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.equation-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.equation-operator {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-emerald);
+}
+
+/* Puzzle Option Styles */
+.puzzle-options {
+    justify-content: flex-start;
+    gap: 15px;
+}
+
+.puzzle-options .choice-button {
+    width: 45px;
+    height: 45px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: rgba(30, 30, 30, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.puzzle-options .choice-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-emerald);
+    transform: translateY(-2px);
+}
+
+/* Assessment Module Styles */
+.assessment-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 10px;
+    gap: 30px;
+    /* Increased gap */
+    flex: 1;
+    /* Take up available space */
+    justify-content: center;
+    /* Center/Spread content */
+    animation: fadeIn 0.5s ease;
+}
+
+.assessment-title {
+    color: var(--accent-emerald);
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.assessment-card {
+    background: rgba(20, 20, 20, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.assessment-question-text {
+    color: #fff;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 5px;
+}
+
+.assessment-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.assessment-option {
+    background: rgba(40, 40, 40, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-align: left;
+    transition: all 0.2s ease;
+}
+
+.assessment-option:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.assessment-option.selected {
+    background: rgba(0, 255, 136, 0.1);
+    border-color: var(--accent-emerald);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+}
+
+.assessment-submit-btn {
+    background: var(--accent-emerald);
+    color: #000;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-family: var(--font-heading);
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+}
+
+.assessment-submit-btn:disabled {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.3);
+    cursor: not-allowed;
+}
+
+.assessment-submit-btn:not(:disabled):hover {
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+    transform: translateY(-2px);
+}
+
+.control-area-btn {
+    width: 100%;
+    margin-top: 0;
+    margin-bottom: 15px;
+    /* Spacing from input */
 }
