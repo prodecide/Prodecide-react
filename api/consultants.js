@@ -40,8 +40,8 @@ export default async function handler(req, res) {
         if (req.method === 'POST') {
             const newConsultant = req.body;
             // Basic validation
-            if (!newConsultant.name || !newConsultant.role) {
-                return res.status(400).json({ error: 'Name and role are required' });
+            if (!newConsultant.name || !newConsultant.email) {
+                return res.status(400).json({ error: 'Name and email are required' });
             }
 
             const result = await consultants.insertOne(newConsultant);
