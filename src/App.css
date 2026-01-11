@@ -213,6 +213,35 @@ body {
     margin-top: 1rem;
 }
 
+.home-link-corner {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    font-size: 1rem;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.3s;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.home-link-corner:hover {
+    background: rgba(0, 255, 65, 0.2);
+    border-color: #00ff41;
+    color: #00ff41;
+    transform: translateY(-2px);
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+}
+
 .secondary-button {
     margin-top: 2rem;
     padding: 0.8rem 2.4rem;
