@@ -6,6 +6,7 @@ import ChatInterface from './components/ChatInterface';
 import Home from './components/Home';
 import Consultants from './components/Consultants';
 import JoinNetwork from './components/JoinNetwork';
+import ConsultantProfile from './components/ConsultantProfile';
 import About from './components/About';
 
 function App() {
@@ -162,6 +163,7 @@ function AppWithRouter() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/consultants" element={<Consultants />} />
+            <Route path="/consultant/:id" element={<ConsultantProfile />} />
             <Route path="/join-network" element={<JoinNetwork />} />
             <Route path="/about" element={<About />} />
             <Route path="/start" element={<PersonaSelectionWrapper />} />

@@ -20,6 +20,19 @@ export default async function handler(req, res) {
         const consultants = database.collection('consultants');
 
         if (req.method === 'GET') {
+            const { id } = req.query;
+            if (id) {
+                const { ObjectId } = await import('mongodb'); // Dynamic import to avoid top-level if needed, or import at top
+                try {
+                    const consultant = await consultants.findOne({ _id: new ObjectId(id) });
+                    if (!consultant) {
+                        return res.status(404).json({ error: 'Consultant not found' });
+                    }
+                    return res.status(200).json(consultant);
+                } catch (e) {
+                    return res.status(400).json({ error: 'Invalid ID format' });
+                }
+            }
             const allConsultants = await consultants.find({}).toArray();
             return res.status(200).json(allConsultants);
         }

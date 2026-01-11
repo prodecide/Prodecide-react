@@ -68,9 +68,9 @@ const Consultants = () => {
                         </div>
                         <p className="consultant-bio">{c.bio}</p>
                         {c.linkedin && (
-                            <a href={c.linkedin} target="_blank" rel="noopener noreferrer" className="linkedin-link">
+                            <NavLink to={`/consultant/${c._id || 'demo'}`} className="linkedin-link">
                                 View Profile →
-                            </a>
+                            </NavLink>
                         )}
                     </div>
                 ))}
