@@ -154,6 +154,9 @@ const ChatInterface = () => {
         const currentKey = sessionQuestions[currentQuestionIndex]?.key;
         if (!currentKey) return;
 
+        // Add user message to chat history
+        setMessages(prev => [...prev, { sender: 'user', text: value }]);
+
         setUserAnswers(prev => ({
             ...prev,
             [currentKey]: value
