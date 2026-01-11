@@ -5,6 +5,7 @@ import PersonaSelection from './components/PersonaSelection';
 import ChatInterface from './components/ChatInterface';
 import Home from './components/Home';
 import Consultants from './components/Consultants';
+import JoinNetwork from './components/JoinNetwork';
 import About from './components/About';
 
 function App() {
@@ -116,7 +117,7 @@ function AppWithRouter() {
 
   const getActiveTab = (path) => {
     if (path === '/') return 'decide';
-    if (path === '/consultants') return 'consultants';
+    if (['/consultants', '/join-network'].includes(path)) return 'consultants';
     if (path === '/about') return 'about';
     return '';
   };
@@ -161,6 +162,7 @@ function AppWithRouter() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/consultants" element={<Consultants />} />
+            <Route path="/join-network" element={<JoinNetwork />} />
             <Route path="/about" element={<About />} />
             <Route path="/start" element={<PersonaSelectionWrapper />} />
             <Route path="/chat/career" element={<ChatInterface />} />
