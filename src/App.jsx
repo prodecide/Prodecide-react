@@ -1,296 +1,174 @@
-import { useState, useEffect } from 'react';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import './App.css';
 import MatrixRain from './components/MatrixRain';
 import PersonaSelection from './components/PersonaSelection';
 import ChatInterface from './components/ChatInterface';
+import Home from './components/Home';
+import Consultants from './components/Consultants';
+import About from './components/About';
 
 function App() {
-  const [view, setView] = useState('landing');
-  const [activeTab, setActiveTab] = useState('decide');
-  const [consultantTab, setConsultantTab] = useState('list');
-  const [formSubmitted, setFormSubmitted] = useState(false);
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    location: '',
-    expertise: '',
-    experience: '',
-    role: '',
-    bio: '',
-    linkedin: '',
-    motivation: ''
-  });
+  const location = useLocation();
 
-  const [consultants, setConsultants] = useState([]);
+  // Determine if header should be visible
+  // Header is visible on landing pages: /, /consultants, /about
+  // Hidden on interactive flows: /start, /chat/career
+  const showHeader = !['/start', '/chat/career'].includes(location.pathname);
 
-  useEffect(() => {
-    fetchConsultants();
-  }, []);
-
-  const fetchConsultants = async () => {
-    try {
-      const response = await fetch('/api/consultants');
-      const data = await response.json();
-      if (Array.isArray(data) && data.length > 0) {
-        setConsultants(data);
-      } else {
-        // Fallback to default if no data in DB
-        setConsultants([
-          {
-            name: "Dr. Aris V.",
-            role: "Strategic Career Analyst",
-            bio: "Expert in mapping psychological patterns to future-proof career paths."
-          },
-          {
-            name: "Neo Spectra",
-            role: "Digital Systems Guide",
-            bio: "Specializes in technology shifts and emerging high-impact markets."
-          },
-          {
-            name: "Trinity M.",
-            role: "Aptitude Architect",
-            bio: "Focuses on unlocking latent cognitive potential through logic training."
-          }
-        ]);
-      }
-    } catch (error) {
-      console.error('Failed to fetch consultants:', error);
-    }
+  const getActiveTab = (path) => {
+    if (path === '/') return 'decide';
+    if (path === '/consultants') return 'consultants';
+    if (path === '/about') return 'about';
+    return '';
   };
 
-
-  const handlePersonaSelect = (persona) => {
-    if (persona === 'career') {
-      setView('chat-career');
-    }
-    // Other personas can be handled here later
-  };
-
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-
-    const newConsultant = {
-      ...formData,
-      name: formData.fullName,
-      role: formData.expertise,
-      bio: formData.bio
-    };
-    console.log(newConsultant);
-
-    try {
-      const response = await fetch('/api/consultants', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newConsultant)
-      });
-
-      if (response.ok) {
-        const savedConsultant = await response.json();
-        setConsultants(prev => [savedConsultant, ...prev]);
-        setFormSubmitted(true);
-      } else {
-        console.error('Failed to save consultant');
-      }
-    } catch (error) {
-      console.error('Error submitting form:', error);
-    }
-  };
+  const activeTab = getActiveTab(location.pathname);
 
   return (
     <>
       <MatrixRain />
       <MatrixRain />
       <div className="app-main-wrapper">
-        {view === 'landing' && (
+        {showHeader && (
           <header className={`main-header ${activeTab !== 'decide' ? 'scrolled' : ''}`}>
             <div className="brand">
               <span className="brand-dot"></span>
               ProDecide
             </div>
             <nav className="nav-tabs">
-              <button
+              <Link
+                to="/"
                 className={`nav-link ${activeTab === 'decide' ? 'active' : ''}`}
-                onClick={() => setActiveTab('decide')}
               >
                 Decide
-              </button>
-              <button
+              </Link>
+              <Link
+                to="/consultants"
                 className={`nav-link ${activeTab === 'consultants' ? 'active' : ''}`}
-                onClick={() => setActiveTab('consultants')}
               >
                 Our Consultants
-              </button>
-              <button
+              </Link>
+              <Link
+                to="/about"
                 className={`nav-link ${activeTab === 'about' ? 'active' : ''}`}
-                onClick={() => setActiveTab('about')}
               >
                 About Us
-              </button>
+              </Link>
             </nav>
           </header>
         )}
 
         <main className="content-area">
-          {view === 'landing' ? (
-            activeTab === 'decide' ? (
-              <section className="hero-section premium-container">
-                <div className="hero-badge">Next-Gen Decision Intelligence</div>
-                <h1 className="hero-title">
-                  Decrypt Your <span className="highlight">Future</span>
-                </h1>
-                <p className="hero-subtitle">
-                  An AI-powered career architect designed to map your cognitive potential to high-impact career paths.
-                </p>
-                <div className="hero-actions">
-                  <button className="cta-button" onClick={() => setView('personas')}>
-                    Start Assessment
-                  </button>
-                  <button className="secondary-button" onClick={() => setActiveTab('about')}>
-                    Learn More
-                  </button>
-                </div>
-              </section>
-            ) : activeTab === 'consultants' ? (
-              <div className="tab-content consultants-view premium-container">
-                <div className="sub-nav">
-                  <button
-                    className={`sub-tab ${consultantTab === 'list' ? 'active' : ''}`}
-                    onClick={() => setConsultantTab('list')}
-                  >
-                    All Experts
-                  </button>
-                  <button
-                    className={`sub-tab ${consultantTab === 'join' ? 'active' : ''}`}
-                    onClick={() => setConsultantTab('join')}
-                  >
-                    Join Network
-                  </button>
-                </div>
-
-                {consultantTab === 'list' ? (
-                  <div className="consultants-grid">
-                    {consultants.map((c, i) => (
-                      <div key={i} className="consultant-card">
-                        <div className="card-glitch-overlay"></div>
-                        <h3 className="consultant-name">{c.name}</h3>
-                        <span className="consultant-role">{c.role}</span>
-                        <div className="consultant-meta">
-                          {c.experience && <span className="meta-tag">{c.experience} Years Exp</span>}
-                          {c.location && <span className="meta-tag">{c.location}</span>}
-                        </div>
-                        <p className="consultant-bio">{c.bio}</p>
-                        {c.linkedin && (
-                          <a href={c.linkedin} target="_blank" rel="noopener noreferrer" className="linkedin-link">
-                            View Profile →
-                          </a>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="join-us-section">
-                    {formSubmitted ? (
-                      <div className="form-success-message">
-                        <div className="success-icon">✓</div>
-                        <h3 className="section-title">Application Received</h3>
-                        <p className="section-text">We’ll review and get back to you.</p>
-                        <button
-                          className="cta-button mini"
-                          onClick={() => { setFormSubmitted(false); setFormData({ fullName: '', email: '', phone: '', location: '', expertise: '', experience: '', role: '', bio: '', linkedin: '', motivation: '' }) }}
-                        >
-                          Apply Again
-                        </button>
-                      </div>
-                    ) : (
-                      <form className="consultant-form" onSubmit={handleFormSubmit}>
-                        <h3 className="section-title">Join as a Consultant</h3>
-                        <div className="form-grid">
-                          <div className="form-group">
-                            <label>Full Name</label>
-                            <input type="text" name="fullName" value={formData.fullName} onChange={handleFormChange} required placeholder="John Doe" />
-                          </div>
-                          <div className="form-group">
-                            <label>Email</label>
-                            <input type="email" name="email" value={formData.email} onChange={handleFormChange} required placeholder="john@example.com" />
-                          </div>
-                          <div className="form-group">
-                            <label>Phone Number</label>
-                            <input type="tel" name="phone" value={formData.phone} onChange={handleFormChange} required placeholder="+1 234 567 890" />
-                          </div>
-                          <div className="form-group">
-                            <label>City / Country</label>
-                            <input type="text" name="location" value={formData.location} onChange={handleFormChange} required placeholder="New York, USA" />
-                          </div>
-                          <div className="form-group full-width">
-                            <label>Area of Expertise</label>
-                            <select name="expertise" value={formData.expertise} onChange={handleFormChange} required>
-                              <option value="">Select Expertise</option>
-                              <option value="Career Coaching">Career Coaching</option>
-                              <option value="Tech Mentoring">Tech Mentoring</option>
-                              <option value="Aptitude Training">Aptitude Training</option>
-                              <option value="HR & Recruitment">HR & Recruitment</option>
-                              <option value="Strategic Planning">Strategic Planning</option>
-                            </select>
-                          </div>
-                          <div className="form-group">
-                            <label>Years of Experience</label>
-                            <input type="number" name="experience" value={formData.experience} onChange={handleFormChange} required placeholder="5" />
-                          </div>
-                          <div className="form-group">
-                            <label>Current Role / Profession</label>
-                            <input type="text" name="role" value={formData.role} onChange={handleFormChange} required placeholder="Senior Developer" />
-                          </div>
-                          <div className="form-group full-width">
-                            <label>Short Bio (2–3 lines)</label>
-                            <textarea name="bio" value={formData.bio} onChange={handleFormChange} required placeholder="Tell us about your professional journey..." rows="3" />
-                          </div>
-                          <div className="form-group full-width">
-                            <label>LinkedIn / Portfolio link</label>
-                            <input type="url" name="linkedin" value={formData.linkedin} onChange={handleFormChange} required placeholder="https://linkedin.com/in/username" />
-                          </div>
-                          <div className="form-group full-width">
-                            <label>Why do you want to join Prodecide? (one line)</label>
-                            <input type="text" name="motivation" value={formData.motivation} onChange={handleFormChange} required placeholder="I want to help people make better career choices." />
-                          </div>
-                        </div>
-                        <button type="submit" className="cta-button submit-form-btn">Submit Application</button>
-                      </form>
-                    )}
-                  </div>
-                )}
-              </div>
-            ) : activeTab === 'about' ? (
-              <div className="tab-content about-view premium-container">
-                <h2 className="tab-title">About ProDecide</h2>
-                <div className="about-grid">
-                  <div className="about-card">
-                    <div className="icon-circle">M</div>
-                    <h3>Our Mission</h3>
-                    <p>To help people make informed decisions through simple, personalized, and intelligent guidance.</p>
-                  </div>
-                  <div className="about-card">
-                    <div className="icon-circle">V</div>
-                    <h3>Our Vision</h3>
-                    <p>To empower people everywhere to make better decisions and take control of their future.</p>
-                  </div>
-                </div>
-              </div>
-            ) : null
-          ) : view === 'personas' ? (
-            <PersonaSelection onSelect={handlePersonaSelect} />
-          ) : view === 'chat-career' ? (
-            <ChatInterface />
-          ) : null}
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/consultants" element={<Consultants />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/start" element={<PersonaSelection onSelect={(persona) => {
+              if (persona === 'career') {
+                // Navigation handled within component or parent wrapper if needed, 
+                // but here we just need to ensure the route exists.
+                // Ideally PersonaSelection should navigate using useNavigate() internally 
+                // or we pass a handler that navigates.
+                // Since I didn't edit PersonaSelection, I should check if it needs props modifications.
+                // For now, let's assume I might need to fast-follow update PersonaSelection if it uses state callback only.
+                // Actually, in the original App.jsx:
+                // <PersonaSelection onSelect={handlePersonaSelect} />
+                // handlePersonaSelect set view to 'chat-career'.
+                // So I should pass a handler that navigates.
+                window.location.href = '/chat/career'; // Or better, use a wrapper to use useNavigate.
+              }
+            }} />} />
+            {/* 
+                We need to handle the onSelect prop for PersonaSelection properly without window.location.ref 
+                inside the JSX if possible. 
+                However, since we can't use useNavigate inside the render of Routes easily for this prop callback 
+                unless we wrap it.
+                Actually, simpler: define a wrapper component or just inline a small wrapper function.
+             */}
+            <Route path="/chat/career" element={<ChatInterface />} />
+          </Routes>
         </main>
       </div>
     </>
   );
 }
 
-export default App;
+// Small wrapper to handle navigation logic for PersonaSelection
+import { useNavigate } from 'react-router-dom';
+
+const PersonaSelectionWrapper = () => {
+  const navigate = useNavigate();
+  return (
+    <PersonaSelection onSelect={(persona) => {
+      if (persona === 'career') {
+        navigate('/chat/career');
+      }
+    }} />
+  );
+};
+
+// Re-exporting App with corrected Route for PersonaSelection
+function AppWithRouter() {
+  const location = useLocation();
+
+  // Determine if header should be visible
+  const showHeader = !['/start', '/chat/career'].includes(location.pathname);
+
+  const getActiveTab = (path) => {
+    if (path === '/') return 'decide';
+    if (path === '/consultants') return 'consultants';
+    if (path === '/about') return 'about';
+    return '';
+  };
+
+  const activeTab = getActiveTab(location.pathname);
+
+  return (
+    <>
+      <MatrixRain />
+      <MatrixRain />
+      <div className="app-main-wrapper">
+        {showHeader && (
+          <header className={`main-header ${activeTab !== 'decide' ? 'scrolled' : ''}`}>
+            <div className="brand">
+              <span className="brand-dot"></span>
+              ProDecide
+            </div>
+            <nav className="nav-tabs">
+              <Link
+                to="/"
+                className={`nav-link ${activeTab === 'decide' ? 'active' : ''}`}
+              >
+                Decide
+              </Link>
+              <Link
+                to="/consultants"
+                className={`nav-link ${activeTab === 'consultants' ? 'active' : ''}`}
+              >
+                Our Consultants
+              </Link>
+              <Link
+                to="/about"
+                className={`nav-link ${activeTab === 'about' ? 'active' : ''}`}
+              >
+                About Us
+              </Link>
+            </nav>
+          </header>
+        )}
+
+        <main className="content-area">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/consultants" element={<Consultants />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/start" element={<PersonaSelectionWrapper />} />
+            <Route path="/chat/career" element={<ChatInterface />} />
+          </Routes>
+        </main>
+      </div>
+    </>
+  );
+}
+
+export default AppWithRouter;
