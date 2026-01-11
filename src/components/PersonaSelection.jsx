@@ -1,8 +1,12 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const PersonaSelection = ({ onSelect }) => {
     return (
         <div className="persona-selection-view premium-container">
+            <Link to="/" className="home-link-corner" title="Back to Home">
+                ⌂
+            </Link>
             <h1 className="persona-title">Select Your Path</h1>
 
             <div className="persona-options">

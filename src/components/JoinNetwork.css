@@ -53,20 +53,25 @@
 }
 
 .form-group label {
-    font-size: 0.75rem;
+    font-size: 14px;
+    /* Requested 14px */
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 0.5rem;
-    color: #a0a0a0;
-    font-weight: 600;
+    color: #ffffff;
+    /* White */
+    font-weight: 700;
+    /* Bold */
 }
 
 /* Inputs */
 .form-group input,
 .form-group textarea,
 .form-group select {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
+    /* Medium transparent white */
+    border: 1px solid #ffffff;
+    /* White border */
     border-radius: 6px;
     padding: 1.2rem;
     /* Increased padding */
@@ -103,10 +108,13 @@
 }
 
 .dropdown-trigger {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
+    /* Match input bg */
+    border: 1px solid #ffffff;
+    /* Match input border */
     border-radius: 6px;
-    padding: 1rem;
+    padding: 1.2rem;
+    /* Match input padding */
     color: #fff;
     cursor: pointer;
     display: flex;
