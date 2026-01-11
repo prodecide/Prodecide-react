@@ -114,7 +114,7 @@ function AppWithRouter() {
   const location = useLocation();
 
   // Determine if header should be visible
-  const showHeader = !['/start', '/chat/career'].includes(location.pathname);
+  const showHeader = !['/chat/career'].includes(location.pathname);
 
   const getActiveTab = (path) => {
     if (path === '/') return 'decide';
@@ -132,30 +132,32 @@ function AppWithRouter() {
       <div className="app-main-wrapper">
         {showHeader && (
           <header className={`main-header ${activeTab !== 'decide' ? 'scrolled' : ''}`}>
-            <div className="brand">
+            <Link to="/" className="brand" style={{ textDecoration: 'none' }}>
               <span className="brand-dot"></span>
               ProDecide
-            </div>
-            <nav className="nav-tabs">
-              <Link
-                to="/"
-                className={`nav-link ${activeTab === 'decide' ? 'active' : ''}`}
-              >
-                Decide
-              </Link>
-              <Link
-                to="/consultants"
-                className={`nav-link ${activeTab === 'consultants' ? 'active' : ''}`}
-              >
-                Our Consultants
-              </Link>
-              <Link
-                to="/about"
-                className={`nav-link ${activeTab === 'about' ? 'active' : ''}`}
-              >
-                About Us
-              </Link>
-            </nav>
+            </Link>
+            {!['/start'].includes(location.pathname) && (
+              <nav className="nav-tabs">
+                <Link
+                  to="/"
+                  className={`nav-link ${activeTab === 'decide' ? 'active' : ''}`}
+                >
+                  Decide
+                </Link>
+                <Link
+                  to="/consultants"
+                  className={`nav-link ${activeTab === 'consultants' ? 'active' : ''}`}
+                >
+                  Our Consultants
+                </Link>
+                <Link
+                  to="/about"
+                  className={`nav-link ${activeTab === 'about' ? 'active' : ''}`}
+                >
+                  About Us
+                </Link>
+              </nav>
+            )}
           </header>
         )}
 

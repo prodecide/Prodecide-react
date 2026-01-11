@@ -4,15 +4,6 @@ import { Link } from 'react-router-dom';
 const PersonaSelection = ({ onSelect }) => {
     return (
         <div className="persona-selection-view premium-container">
-            <div className="home-nav-absolute">
-                <div className="brand">
-                    <span className="brand-dot"></span>
-                    ProDecide
-                </div>
-                <Link to="/" className="cta-button mini-home">
-                    Home
-                </Link>
-            </div>
             <h1 className="persona-title">Select Your Path</h1>
 
             <div className="persona-options">
