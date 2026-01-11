@@ -32,6 +32,14 @@ const AIIndicator = () => (
     </div>
 );
 
+const UserIndicator = () => (
+    <div className="user-indicator-wrapper">
+        <div className="user-bubble">
+            <div className="user-bubble-pulse"></div>
+        </div>
+    </div>
+);
+
 const ChatInterface = () => {
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
@@ -242,7 +250,7 @@ const ChatInterface = () => {
                         {messages.map((msg, idx) => (
                             <div key={idx} className={`chat-message ${msg.sender}`}>
                                 <span className="message-prefix">
-                                    {msg.sender === 'ai' ? <AIIndicator /> : 'USER'}
+                                    {msg.sender === 'ai' ? <AIIndicator /> : <UserIndicator />}
                                 </span>
                                 <span className="message-text">{msg.text}</span>
                             </div>
