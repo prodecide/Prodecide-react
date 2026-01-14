@@ -8,6 +8,7 @@ import Consultants from './components/Consultants';
 import JoinNetwork from './components/JoinNetwork';
 import ConsultantProfile from './components/ConsultantProfile';
 import About from './components/About';
+import ResultsPage from './components/ResultsPage';
 
 function App() {
   const location = useLocation();
@@ -170,6 +171,7 @@ function AppWithRouter() {
             <Route path="/about" element={<About />} />
             <Route path="/start" element={<PersonaSelectionWrapper />} />
             <Route path="/chat/career" element={<ChatInterface />} />
+            <Route path="/results/:id" element={<ResultsPage />} />
           </Routes>
         </main>
       </div>

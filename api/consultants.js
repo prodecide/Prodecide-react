@@ -1,28 +1,15 @@
-import { MongoClient } from 'mongodb';
-
-let client;
+import clientPromise from '../lib/mongodb.js';
+import { ObjectId } from 'mongodb';
 
 export default async function handler(req, res) {
-    const uri = process.env.MONGODB_URI;
-    console.log(uri);
-
-    if (!uri) {
-        return res.status(500).json({ error: 'MONGODB_URI environment variable is missing. Please add it to your Vercel project.' });
-    }
-
     try {
-        if (!client) {
-            client = new MongoClient(uri);
-            await client.connect();
-        }
-
+        const client = await clientPromise;
         const database = client.db('prodecide');
         const consultants = database.collection('consultants');
 
         if (req.method === 'GET') {
             const { id } = req.query;
             if (id) {
-                const { ObjectId } = await import('mongodb'); // Dynamic import to avoid top-level if needed, or import at top
                 try {
                     const consultant = await consultants.findOne({ _id: new ObjectId(id) });
                     if (!consultant) {
