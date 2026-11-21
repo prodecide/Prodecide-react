@@ -14,7 +14,8 @@ const app = express();
 const port = 3001;
 
 app.use(cors());
-app.use(express.json());
+// Keep the exact bytes of the body: Meta signs the raw payload (Instagram webhook).
+app.use(express.json({ verify: (req, _res, buf) => { req.rawBody = buf.toString('utf8'); } }));
 
 app.get('/api/test', (req, res) => {
     res.send("Server is working and updated!");
@@ -69,10 +70,24 @@ app.get('/api/get-result', async (req, res) => {
     }
 });
 
+// Instagram automation (admin API, Meta webhook, inbox poll)
+for (const name of ['instagram-admin', 'instagram-webhook', 'instagram-poll']) {
+    app.all(`/api/${name}`, async (req, res) => {
+        try {
+            const { default: handler } = await import(`./api/${name}.js`);
+            await handler(req, res);
+        } catch (error) {
+            console.error(`Error in ${name} handler:`, error);
+            if (!res.headersSent) res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
+}
+
 app.listen(port, () => {
     console.log(`Local API server running at http://localhost:${port}`);
     console.log(`- POST /api/analyze`);
     console.log(`- POST /api/save-result`);
     console.log(`- GET  /api/get-result`);
     console.log(`- GET/POST /api/consultants`);
+    console.log(`- /api/instagram-admin, /api/instagram-webhook, /api/instagram-poll`);
 });

@@ -1,4 +1,4 @@
-import { Routes, Route, Link, useLocation } from 'react-router-dom';
+import { Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
 import './App.css';
 import MatrixRain from './components/MatrixRain';
 import PersonaSelection from './components/PersonaSelection';
@@ -9,6 +9,7 @@ import JoinNetwork from './components/JoinNetwork';
 import ConsultantProfile from './components/ConsultantProfile';
 import About from './components/About';
 import ResultsPage from './components/ResultsPage';
+import AdminInstagram from './components/AdminInstagram';
 
 function App() {
   const location = useLocation();
@@ -172,6 +173,8 @@ function AppWithRouter() {
             <Route path="/start" element={<PersonaSelectionWrapper />} />
             <Route path="/chat/career" element={<ChatInterface />} />
             <Route path="/results/:id" element={<ResultsPage />} />
+            <Route path="/admin" element={<Navigate to="/admin/instagram" replace />} />
+            <Route path="/admin/instagram" element={<AdminInstagram />} />
           </Routes>
         </main>
       </div>
